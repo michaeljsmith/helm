@@ -43,7 +43,7 @@ LDFLAGS=-g -lGL `sdl-config --libs` --std=c++11 -Werror -Weverything -lpthread
 
 # Basic configuration variables.
 config=out
-module_name=curio
+module_name=helm
 module_source_dir=.
 module_dep_dir=dep
 module_obj_dir=obj
