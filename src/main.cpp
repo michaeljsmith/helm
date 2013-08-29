@@ -5,6 +5,7 @@
 #include <vector>
 #include <time.h>
 #include <sys/time.h>
+#include <curses.h>
 #include <boost/signal.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
@@ -193,8 +194,28 @@ struct Renderable : noncopyable {
 Renderable::~Renderable() {}
 
 inline void terminal_ui(Trigger const& _loop, Renderable const& _renderer) {
+
+  WINDOW * mainwin;
+  if ( (mainwin = initscr()) == NULL ) {
+    fprintf(stderr, "Error initializing ncurses.\n");
+    exit(EXIT_FAILURE);
+  }
+
+  noecho();
+  nodelay(mainwin, TRUE);
+  keypad(mainwin, TRUE);
+  curs_set(0);
+
+  defer([=]() {
+    curs_set(1);
+    delwin(mainwin);
+    endwin();
+    refresh();
+  });
+
   listen(_loop, [&_renderer]() {
     _renderer.render();
+    refresh();
   });
 }
 
@@ -205,7 +226,7 @@ inline Renderable& label(Value<string> const& _text) {
     RenderableImpl(Value<string> const& t): text(t) {}
 
     virtual void render() const {
-      cout << text.get() << "\n";
+      mvaddstr(5, 10, text.get().c_str());
     }
   };
 
