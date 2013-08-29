@@ -116,20 +116,6 @@ Value<void>::~Value() {
 }
 
 template <typename T>
-struct Size {
-  Value<T> x;
-  Value<T> y;
-
-  Size() {}
-  Size(T const& _x, T const& _y): x(_x), y(_y) {}
-};
-
-template <typename T>
-inline Size<T> size(T const& x, T const& y) {
-  return member<Size>(x, y);
-}
-
-template <typename T>
 void listen(Value<T> const& _value, function<void ()> const& _fn) {
   auto _handle = _value.registerListener(_fn);
   defer([=, &_value]() {
@@ -150,19 +136,59 @@ Value<T> const& constant(T const& _value) {
   return member<Value<T>>(_value);
 }
 
+template <typename T, typename F>
+inline Value<T>& applyBinary(F const& fn, Value<T> const& _l, Value<T> const& _r) {
+  auto& _result = member<Value<T>>();
+
+  auto update = [&]() {
+    _result.set(fn(_l.get(), _r.get()));
+  };
+  update();
+
+  listen(_l, update);
+  listen(_r, update);
+
+  return _result;
+}
+
+template <typename T>
+Value<T>& operator+(Value<T> const& _l, Value<T> const& _r) {
+  return applyBinary(plus<T>(), _l, _r);
+}
+
+template <typename T>
+Value<T>& operator/(Value<T> const& _l, Value<T> const& _r) {
+  return applyBinary(divides<T>(), _l, _r);
+}
+
 using Trigger = Value<void>;
 using Integer = Value<int>;
 using Float = Value<float>;
+using String = Value<string>;
 
 template <typename T>
-Value<string> const& format(Value<T> const& _value) {
-  auto& _out = member<Value<string>>(lexical_cast<string>(_value.get()));
+String const& format(Value<T> const& _value) {
+  auto& _out = member<String>(lexical_cast<string>(_value.get()));
 
   listen(_value, [&]() {
     _out.set(lexical_cast<string>(_value.get()));
   });
 
   return _out;
+}
+
+template <typename T>
+struct Size {
+  Value<T> x;
+  Value<T> y;
+
+  Size() {}
+  Size(T const& _x, T const& _y): x(_x), y(_y) {}
+};
+
+template <typename T>
+inline Size<T> size(T const& x, T const& y) {
+  return member<Size>(x, y);
 }
 
 template <typename T>
@@ -174,13 +200,13 @@ struct Positionable : noncopyable {
 template <typename T>
 struct Rigid : public Positionable<T> {
   T const& size;
-  Rigid(T const& _s, T& _p): Positionable<T>(_p), size(_s) {}
+  Rigid(T& _p, T const& _s): Positionable<T>(_p), size(_s) {}
 };
 
 template <typename T>
 struct Flexible : public Positionable<T> {
   T& size;
-  Flexible(T& _s, T& _p): Positionable<T>(_p), size(_s) {}
+  Flexible(T& _p, T& _s): Positionable<T>(_p), size(_s) {}
 };
 
 template <typename T, typename P, template <typename> class X, template <typename> class Y>
@@ -258,7 +284,7 @@ inline Size<int>& terminalSize() {
   return member<Size<int>>(ws.ws_row, ws.ws_col);
 }
 
-inline void terminal_ui(Trigger const& _loop, Widget<Flexible, Flexible>& _widget) {
+inline void terminalUi(Trigger const& _loop, Widget<Flexible, Flexible>& _widget) {
 
   WINDOW* window;
   if ((window = initscr()) == nullptr) {
@@ -288,28 +314,54 @@ inline void terminal_ui(Trigger const& _loop, Widget<Flexible, Flexible>& _widge
   });
 }
 
-inline Widget<Flexible, Flexible>& label(Value<string> const& _text) {
+inline Widget<Flexible, Flexible>& center(Widget<Rigid, Rigid>& _child) {
+  auto& _x = member<Integer>();
+  auto& _y = member<Integer>();
+  auto& _w = member<Integer>();
+  auto& _h = member<Integer>();
+
+  track(_child.x.position, _x + _w / constant(2));
+  track(_child.y.position, _y + _h / constant(2));
+
+  return member<Widget<Flexible, Flexible>>(
+      _child.payload,
+      member<Flexible<Integer>>(_x, _w),
+      member<Flexible<Integer>>(_y, _h));
+}
+
+inline Widget<Rigid, Rigid>& label(String const& _text) {
   class RenderableImpl : public Renderable {
-    Value<string> const& text;
+    String const& text;
+    Integer& x;
+    Integer& y;
+
    public:
-    RenderableImpl(Value<string> const& t): text(t) {}
+    Integer& w;
+    Integer& h;
+    RenderableImpl(String const& t, Integer& x_, Integer& y_, Integer& w_, Integer& h_)
+        : text(t), x(x_), y(y_), w(w_), h(h_) {}
 
     virtual void render() const {
-      mvaddstr(5, 10, text.get().c_str());
+      mvaddstr(x.get(), y.get(), text.get().c_str());
     }
   };
 
-  return member<Widget<Flexible, Flexible>>(
-      member<RenderableImpl>(_text),
-      member<Flexible<Integer>>(member<Integer>(), member<Integer>()),
-      member<Flexible<Integer>>(member<Integer>(), member<Integer>()));
+  auto& _x = member<Integer>();
+  auto& _y = member<Integer>();
+  auto& _w = member<Integer>();
+  auto& _h = member<Integer>();
+
+  return member<Widget<Rigid, Rigid>>(
+      member<RenderableImpl>(_text, _x, _y, _w, _h),
+      member<Rigid<Integer>>(_x, _w),
+      member<Rigid<Integer>>(_y, _h));
 }
 
 int main() {
   activityMain([] () -> Activity& {
     return runWithClock([] (Float const& _time, Trigger const& _loop) {
 
-      terminal_ui(_loop, label(format(_time)));
+      terminalUi(_loop, center(label(format(_time))));
     });
   });
 }
