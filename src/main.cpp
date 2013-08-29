@@ -6,10 +6,14 @@
 #include <time.h>
 #include <sys/time.h>
 #include <boost/signal.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using boost::signal;
 using boost::signals::connection;
+using boost::noncopyable;
+using boost::lexical_cast;
 
 template<typename T, typename ...Args>
 std::unique_ptr<T> make_unique(Args&& ...args) {
@@ -83,6 +87,9 @@ class Value : public ValueBase {
   T value;
 
  public:
+  Value() {}
+  Value(T const& v): value(v) {}
+
   void set(T const& newValue) {
     value = newValue;
     notify();
@@ -114,15 +121,38 @@ void listen(Value<T> const& _value, function<void ()> const& _fn) {
   });
 }
 
+template <typename T>
+Value<T> const& constant(T const& _value) {
+  return member<Value<T>>(_value);
+}
+
 using Trigger = Value<void>;
 using Float = Value<float>;
 
-struct Activity {
+template <typename T>
+Value<string> const& format(Value<T> const& _value) {
+  auto& _out = member<Value<string>>(lexical_cast<string>(_value.get()));
+
+  listen(_value, [&]() {
+    _out.set(lexical_cast<string>(_value.get()));
+  });
+
+  return _out;
+}
+
+struct Activity : noncopyable {
   virtual ~Activity();
   virtual void perform() = 0;
 };
 
 Activity::~Activity() {}
+
+inline void activityMain(function<Activity& ()> genActivity) {
+  beginObject();
+  auto& activity = genActivity();
+  activity.perform();
+  cleanupObject();
+}
 
 inline Activity& runWithClock(function<void (Float const& time, Trigger const& loop)> gen) {
   auto& _time = member<Float>();
@@ -145,7 +175,8 @@ inline Activity& runWithClock(function<void (Float const& time, Trigger const& l
         nanosleep(&req, nullptr);
 
         auto t1 = currentTime();
-        auto dt = t1 - t;
+        auto dt = (t1 - t) / 1000.0f;
+        t = t1;
         time.set(time.get() + dt); // TODO: Switch to integer to avoid precision problems.
       }
     }
@@ -154,23 +185,38 @@ inline Activity& runWithClock(function<void (Float const& time, Trigger const& l
   return member<ActivityImpl>(_time, _loop);
 }
 
-inline void activityMain(function<Activity& ()> genActivity) {
-  beginObject();
-  auto& activity = genActivity();
-  activity.perform();
-  cleanupObject();
+struct Renderable : noncopyable {
+  virtual ~Renderable();
+  virtual void render() const = 0;
+};
+
+Renderable::~Renderable() {}
+
+inline void terminal_ui(Trigger const& _loop, Renderable const& _renderer) {
+  listen(_loop, [&_renderer]() {
+    _renderer.render();
+  });
 }
 
-inline void terminal_ui(Trigger const& _loop) {
-  listen(_loop, []() {
-    cout << "rendering\n";
-  });
+inline Renderable& label(Value<string> const& _text) {
+  class RenderableImpl : public Renderable {
+    Value<string> const& text;
+   public:
+    RenderableImpl(Value<string> const& t): text(t) {}
+
+    virtual void render() const {
+      cout << text.get() << "\n";
+    }
+  };
+
+  return member<RenderableImpl>(_text);
 }
 
 int main() {
   activityMain([] () -> Activity& {
-    return runWithClock([] (Float const& /*_time*/, Trigger const& _loop) {
-      terminal_ui(_loop);
+    return runWithClock([] (Float const& _time, Trigger const& _loop) {
+
+      terminal_ui(_loop, label(format(_time)));
     });
   });
 }
