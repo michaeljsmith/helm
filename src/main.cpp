@@ -22,6 +22,56 @@ std::unique_ptr<T> make_unique(Args&& ...args) {
   return std::unique_ptr<T>(new T(forward<Args>(args)...));
 }
 
+struct ArgNil {
+};
+
+extern ArgNil const& argNil;
+auto const& argNil = ArgNil();
+
+template <typename H, typename T>
+struct ArgCons {
+  H head;
+  T tail;
+
+  ArgCons(H _head, T _tail): head(_head), tail(_tail) {}
+};
+
+template <typename H, typename T>
+ArgCons<H, T> argCons(H&& _head, T&& _tail) {return ArgCons<H, T>(forward<H>(_head), forward<T>(_tail));}
+
+template <typename F, typename H, typename A, typename... Args>
+inline auto applyToArgListRecurse(F&& fn, ArgCons<H, A>&& accum, Args&&... args)
+  -> decltype(applyToArgListRecurse(forward<F>(fn), forward<A>(accum.tail), forward<H>(accum.head), forward<Args>(args)...)) {
+  return applyToArgListRecurse(forward<F>(fn), forward<A>(accum.tail), forward<H>(accum.head), forward<Args>(args)...);
+}
+
+template <typename F, typename... Args>
+inline auto applyToArgListRecurse(F&& fn, ArgNil const& /*accum*/, Args&&... args)
+  -> decltype(fn(forward<Args>(args)...)) {
+  return fn(forward<Args>(args)...);
+}
+
+template <typename F, typename T, typename A, typename H, typename... Rest>
+inline auto applyToTransformedArgsRecurse(F&& fn, T&& transform, A&& accum, H&& head, Rest&&... rest)
+  -> decltype(applyToTransformedArgsRecurse(forward<F>(fn), forward<T>(transform), argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...)) {
+
+  return applyToTransformedArgsRecurse(forward<F>(fn), forward<T>(transform), argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...);
+}
+
+template <typename F, typename T, typename A>
+inline auto applyToTransformedArgsRecurse(F&& fn, T&& /*transform*/, A&& accum)
+  -> decltype(applyToArgListRecurse(forward<F>(fn), forward<A>(accum))) {
+
+  return applyToArgListRecurse(forward<F>(fn), forward<A>(accum));
+}
+
+template <typename F, typename T, typename... Args>
+inline auto applyToTransformedArgs(F&& fn, T&& transform, Args&&... args)
+  -> decltype(applyToTransformedArgsRecurse(forward<F>(fn), forward<T>(transform), argNil, forward<Args>(args)...)) {
+
+  return applyToTransformedArgsRecurse(forward<F>(fn), forward<T>(transform), argNil, forward<Args>(args)...);
+}
+
 inline unsigned currentTime() {
   struct timeval tv;
   gettimeofday(&tv, nullptr);
@@ -123,6 +173,15 @@ void listen(Value<T> const& _value, function<void ()> const& _fn) {
   });
 }
 
+inline void listenToAll(function<void ()> const& /*_fn*/) {
+}
+
+template <typename T, typename... Rest>
+inline void listenToAll(function<void ()> const& _fn, Value<T> const& _value, Rest const&... _rest) {
+  listen(_value, _fn);
+  listenToAll(_fn, _rest...);
+}
+
 template <typename T>
 void track(Value<T>& _dst, Value<T> const& _src) {
   _dst.set(_src.get());
@@ -147,6 +206,33 @@ inline Value<T>& applyBinary(F const& fn, Value<T> const& _l, Value<T> const& _r
 
   listen(_l, update);
   listen(_r, update);
+
+  return _result;
+}
+
+struct ValueGet {
+  template <typename T>
+  T operator()(Value<T> const& val) const {
+    return val.get();
+  }
+};
+
+template <typename F, typename... Args>
+inline auto trackApply(F&& fn, Args const&... args)
+  -> Value<decltype(applyToTransformedArgs(fn, ValueGet(), args...))>& {
+
+  auto getResult = [&]() {
+    return applyToTransformedArgs(fn, ValueGet(), args...);
+  };
+
+  using T = decltype(getResult());
+
+  auto& _result = member<Value<T>>(getResult());
+
+  auto update = [&]() {
+    _result.set(getResult());
+  };
+  listenToAll(update, args...);
 
   return _result;
 }
@@ -357,56 +443,6 @@ inline Widget<Rigid, Rigid>& label(String const& _text) {
       member<Rigid<Integer>>(_y, _h));
 }
 
-struct ArgNil {
-};
-
-extern ArgNil const& argNil;
-auto const& argNil = ArgNil();
-
-template <typename H, typename T>
-struct ArgCons {
-  H head;
-  T tail;
-
-  ArgCons(H _head, T _tail): head(_head), tail(_tail) {}
-};
-
-template <typename H, typename T>
-ArgCons<H, T> argCons(H&& _head, T&& _tail) {return ArgCons<H, T>(forward<H>(_head), forward<T>(_tail));}
-
-template <typename F, typename H, typename A, typename... Args>
-inline auto applyAccumulator(F&& fn, ArgCons<H, A>&& accum, Args&&... args)
-  -> decltype(applyAccumulator(forward<F>(fn), forward<A>(accum.tail), forward<H>(accum.head), forward<Args>(args)...)) {
-  return applyAccumulator(forward<F>(fn), forward<A>(accum.tail), forward<H>(accum.head), forward<Args>(args)...);
-}
-
-template <typename F, typename... Args>
-inline auto applyAccumulator(F&& fn, ArgNil const& /*accum*/, Args&&... args)
-  -> decltype(fn(forward<Args>(args)...)) {
-  return fn(forward<Args>(args)...);
-}
-
-template <typename F, typename T, typename A, typename H, typename... Rest>
-inline auto applyAccumulatorAndArgs(F&& fn, T&& transform, A&& accum, H&& head, Rest&&... rest)
-  -> decltype(applyAccumulatorAndArgs(forward<F>(fn), forward<T>(transform), argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...)) {
-
-  return applyAccumulatorAndArgs(forward<F>(fn), forward<T>(transform), argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...);
-}
-
-template <typename F, typename T, typename A>
-inline auto applyAccumulatorAndArgs(F&& fn, T&& /*transform*/, A&& accum)
-  -> decltype(applyAccumulator(forward<F>(fn), forward<A>(accum))) {
-
-  return applyAccumulator(forward<F>(fn), forward<A>(accum));
-}
-
-template <typename F, typename T, typename... Args>
-inline auto apply(F&& fn, T&& transform, Args&&... args)
-  -> decltype(applyAccumulatorAndArgs(forward<F>(fn), forward<T>(transform), argNil, forward<Args>(args)...)) {
-
-  return applyAccumulatorAndArgs(forward<F>(fn), forward<T>(transform), argNil, forward<Args>(args)...);
-}
-
 template <typename T> struct Box {
   T val;
   Box(T const& _val): val(_val) {}
@@ -464,7 +500,7 @@ inline void bar(T&& x) {
 
 inline void test() {
   auto box = Box<float>(11.1f);
-  cout << apply(foo, Extract(), Box<int>(-7), box) << "\n"; cout << box.val << "\n";
+  cout << applyToTransformedArgs(foo, Extract(), Box<int>(-7), box) << "\n"; cout << box.val << "\n";
   //cout << applyAccumulatorAndArgs(foo, Extract(), argNil, box) << "\n"; cout << box.val << "\n";
   //cout << applyAccumulatorAndArgs(foo, Extract(), argCons(box.val, argNil)) << "\n"; cout << box.val << "\n";
   //cout << applyAccumulator(foo, argCons(box.val, argNil)) << "\n"; cout << box.val << "\n";
@@ -483,11 +519,11 @@ inline void test() {
 }
 
 int main() {
-  test();
-  //activityMain([] () -> Activity& {
-  //  return runWithClock([] (Float const& _time, Trigger const& _loop) {
+  //test();
+  activityMain([] () -> Activity& {
+    return runWithClock([] (Float const& _time, Trigger const& _loop) {
 
-  //    terminalUi(_loop, center(label(format(_time))));
-  //  });
-  //});
+      terminalUi(_loop, center(label(format(_time))));
+    });
+  });
 }
