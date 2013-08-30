@@ -374,20 +374,10 @@ struct ArgCons {
 template <typename H, typename T>
 ArgCons<H, T> argCons(H&& _head, T&& _tail) {return ArgCons<H, T>(forward<H>(_head), forward<T>(_tail));}
 
-template <typename H, typename T>
-inline H argCar(ArgCons<H, T>&& cons) {
-  return cons.head;
-}
-
-template <typename H, typename T>
-inline T argCdr(ArgCons<H, T>&& cons) {
-  return cons.tail;
-}
-
 template <typename F, typename H, typename A, typename... Args>
 inline auto applyAccumulator(F&& fn, ArgCons<H, A>&& accum, Args&&... args)
-  -> decltype(applyAccumulator(forward<F>(fn), argCdr(forward<ArgCons<H, A>>(accum)), argCar(forward<ArgCons<H, A>>(accum)), forward<Args>(args)...)) {
-  return applyAccumulator(forward<F>(fn), argCdr(forward<ArgCons<H, A>>(accum)), argCar(forward<ArgCons<H, A>>(accum)), forward<Args>(args)...);
+  -> decltype(applyAccumulator(forward<F>(fn), forward<A>(accum.tail), forward<H>(accum.head), forward<Args>(args)...)) {
+  return applyAccumulator(forward<F>(fn), forward<A>(accum.tail), forward<H>(accum.head), forward<Args>(args)...);
 }
 
 template <typename F, typename... Args>
@@ -412,7 +402,7 @@ inline auto applyAccumulatorAndArgs(F&& fn, T&& /*transform*/, A&& accum)
 
 template <typename F, typename T, typename... Args>
 inline auto apply(F&& fn, T&& transform, Args&&... args)
-    -> decltype(applyAccumulatorAndArgs(forward<F>(fn), forward<T>(transform), argNil, forward<Args>(args)...)) {
+  -> decltype(applyAccumulatorAndArgs(forward<F>(fn), forward<T>(transform), argNil, forward<Args>(args)...)) {
 
   return applyAccumulatorAndArgs(forward<F>(fn), forward<T>(transform), argNil, forward<Args>(args)...);
 }
@@ -480,7 +470,6 @@ inline void test() {
   //cout << applyAccumulator(foo, argCons(box.val, argNil)) << "\n"; cout << box.val << "\n";
   //cout << applyAccumulator(foo, argNil, -7, box.val) << "\n"; cout << box.val << "\n";
   //cout << foo(argCar(argCons(box.val, argNil))) << "\n"; cout << box.val << "\n";
-  //cout << argCdr(argCons(7, argNil));
 
   //auto pack = argCons(box, argNil);
   //auto& box2 = argCar(move(pack));
