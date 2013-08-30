@@ -397,24 +397,24 @@ inline auto applyAccumulator(F&& fn, ArgNil const& /*accum*/, Args&&... args)
 }
 
 template <typename F, typename T, typename A, typename H, typename... Rest>
-inline auto applyAccumulatorAndArgs(F&& fn, T const& transform, A&& accum, H&& head, Rest&&... rest)
-  -> decltype(applyAccumulatorAndArgs(forward<F>(fn), transform, argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...)) {
+inline auto applyAccumulatorAndArgs(F&& fn, T&& transform, A&& accum, H&& head, Rest&&... rest)
+  -> decltype(applyAccumulatorAndArgs(forward<F>(fn), forward<T>(transform), argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...)) {
 
-  return applyAccumulatorAndArgs(forward<F>(fn), transform, argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...);
+  return applyAccumulatorAndArgs(forward<F>(fn), forward<T>(transform), argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...);
 }
 
 template <typename F, typename T, typename A>
-inline auto applyAccumulatorAndArgs(F&& fn, T const& /*transform*/, A&& accum)
+inline auto applyAccumulatorAndArgs(F&& fn, T&& /*transform*/, A&& accum)
   -> decltype(applyAccumulator(forward<F>(fn), forward<A>(accum))) {
 
   return applyAccumulator(forward<F>(fn), forward<A>(accum));
 }
 
 template <typename F, typename T, typename... Args>
-inline auto apply(F&& fn, T const& transform, Args&&... args)
-    -> decltype(applyAccumulatorAndArgs(forward<F>(fn), transform, argNil, forward<Args>(args)...)) {
+inline auto apply(F&& fn, T&& transform, Args&&... args)
+    -> decltype(applyAccumulatorAndArgs(forward<F>(fn), forward<T>(transform), argNil, forward<Args>(args)...)) {
 
-  return applyAccumulatorAndArgs(forward<F>(fn), transform, argNil, forward<Args>(args)...);
+  return applyAccumulatorAndArgs(forward<F>(fn), forward<T>(transform), argNil, forward<Args>(args)...);
 }
 
 template <typename T> struct Box {
