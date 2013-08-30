@@ -7,18 +7,17 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <curses.h>
-#include <boost/signal.hpp>
+#include <boost/signals2.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
-using boost::signal;
-using boost::signals::connection;
+using boost::signals2::connection;
 using boost::noncopyable;
 using boost::lexical_cast;
 
 template<typename T, typename ...Args>
-std::unique_ptr<T> make_unique(Args&& ...args) {
+unique_ptr<T> make_unique(Args&& ...args) {
   return std::unique_ptr<T>(new T(forward<Args>(args)...));
 }
 
@@ -61,7 +60,7 @@ inline void defer(function<void ()> fn) {
 }
 
 class ValueBase {
-  mutable signal<void ()> sig;
+  mutable boost::signals2::signal<void ()> sig;
 
  protected:
   void notify() {
@@ -305,6 +304,8 @@ inline void terminalUi(Trigger const& _loop, Widget<Flexible, Flexible>& _widget
   });
 
   auto& _size = terminalSize();
+  _widget.x.position.set(0);
+  _widget.y.position.set(0);
   track(_widget.x.size, _size.x);
   track(_widget.y.size, _size.y);
 
