@@ -385,36 +385,36 @@ inline T argCdr(ArgCons<H, T>&& cons) {
 }
 
 template <typename F, typename H, typename A, typename... Args>
-inline auto applyAccumulator(F const& fn, ArgCons<H, A>&& accum, Args&&... args)
-  -> decltype(applyAccumulator(fn, argCdr(forward<ArgCons<H, A>>(accum)), argCar(forward<ArgCons<H, A>>(accum)), forward<Args>(args)...)) {
-  return applyAccumulator(fn, argCdr(forward<ArgCons<H, A>>(accum)), argCar(forward<ArgCons<H, A>>(accum)), forward<Args>(args)...);
+inline auto applyAccumulator(F&& fn, ArgCons<H, A>&& accum, Args&&... args)
+  -> decltype(applyAccumulator(forward<F>(fn), argCdr(forward<ArgCons<H, A>>(accum)), argCar(forward<ArgCons<H, A>>(accum)), forward<Args>(args)...)) {
+  return applyAccumulator(forward<F>(fn), argCdr(forward<ArgCons<H, A>>(accum)), argCar(forward<ArgCons<H, A>>(accum)), forward<Args>(args)...);
 }
 
 template <typename F, typename... Args>
-inline auto applyAccumulator(F const& fn, ArgNil const& /*accum*/, Args&&... args)
+inline auto applyAccumulator(F&& fn, ArgNil const& /*accum*/, Args&&... args)
   -> decltype(fn(forward<Args>(args)...)) {
   return fn(forward<Args>(args)...);
 }
 
 template <typename F, typename T, typename A, typename H, typename... Rest>
-inline auto applyAccumulatorAndArgs(F const& fn, T const& transform, A&& accum, H&& head, Rest&&... rest)
-  -> decltype(applyAccumulatorAndArgs(fn, transform, argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...)) {
+inline auto applyAccumulatorAndArgs(F&& fn, T const& transform, A&& accum, H&& head, Rest&&... rest)
+  -> decltype(applyAccumulatorAndArgs(forward<F>(fn), transform, argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...)) {
 
-  return applyAccumulatorAndArgs(fn, transform, argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...);
+  return applyAccumulatorAndArgs(forward<F>(fn), transform, argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...);
 }
 
 template <typename F, typename T, typename A>
-inline auto applyAccumulatorAndArgs(F const& fn, T const& /*transform*/, A&& accum)
-  -> decltype(applyAccumulator(fn, forward<A>(accum))) {
+inline auto applyAccumulatorAndArgs(F&& fn, T const& /*transform*/, A&& accum)
+  -> decltype(applyAccumulator(forward<F>(fn), forward<A>(accum))) {
 
-  return applyAccumulator(fn, forward<A>(accum));
+  return applyAccumulator(forward<F>(fn), forward<A>(accum));
 }
 
 template <typename F, typename T, typename... Args>
-inline auto apply(F const& fn, T const& transform, Args&&... args)
-    -> decltype(applyAccumulatorAndArgs(fn, transform, argNil, forward<Args>(args)...)) {
+inline auto apply(F&& fn, T const& transform, Args&&... args)
+    -> decltype(applyAccumulatorAndArgs(forward<F>(fn), transform, argNil, forward<Args>(args)...)) {
 
-  return applyAccumulatorAndArgs(fn, transform, argNil, forward<Args>(args)...);
+  return applyAccumulatorAndArgs(forward<F>(fn), transform, argNil, forward<Args>(args)...);
 }
 
 template <typename T> struct Box {
@@ -431,10 +431,18 @@ struct Extract {
   }
 };
 
-inline string foo(int a, float& b) {
-  b += 1.0f;
-  return lexical_cast<string>(a) + " " + lexical_cast<string>(b);
-}
+struct Foo {
+  int c = 0;
+  string operator()(int a, float& b) {
+    ++c;
+    b += 1.0f;
+    return lexical_cast<string>(a) + " " + lexical_cast<string>(b);
+  }
+};
+
+extern Foo foo;
+auto foo = Foo();
+
 //struct Identity {
 //  template <typename T> T operator()(T value) const {
 //    return value;
@@ -470,7 +478,7 @@ inline void test() {
   //cout << applyAccumulatorAndArgs(foo, Extract(), argNil, box) << "\n"; cout << box.val << "\n";
   //cout << applyAccumulatorAndArgs(foo, Extract(), argCons(box.val, argNil)) << "\n"; cout << box.val << "\n";
   //cout << applyAccumulator(foo, argCons(box.val, argNil)) << "\n"; cout << box.val << "\n";
-  //cout << applyAccumulator(foo, argNil, box.val) << "\n"; cout << box.val << "\n";
+  //cout << applyAccumulator(foo, argNil, -7, box.val) << "\n"; cout << box.val << "\n";
   //cout << foo(argCar(argCons(box.val, argNil))) << "\n"; cout << box.val << "\n";
   //cout << argCdr(argCons(7, argNil));
 
