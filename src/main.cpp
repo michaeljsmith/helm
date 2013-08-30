@@ -357,11 +357,140 @@ inline Widget<Rigid, Rigid>& label(String const& _text) {
       member<Rigid<Integer>>(_y, _h));
 }
 
-int main() {
-  activityMain([] () -> Activity& {
-    return runWithClock([] (Float const& _time, Trigger const& _loop) {
+struct ArgNil {
+};
 
-      terminalUi(_loop, center(label(format(_time))));
-    });
-  });
+extern ArgNil const& argNil;
+auto const& argNil = ArgNil();
+
+template <typename H, typename T>
+struct ArgCons {
+  H head;
+  T tail;
+
+  ArgCons(H _head, T _tail): head(_head), tail(_tail) {}
+};
+
+template <typename H, typename T>
+ArgCons<H, T> argCons(H&& _head, T&& _tail) {return ArgCons<H, T>(forward<H>(_head), forward<T>(_tail));}
+
+template <typename H, typename T>
+inline H argCar(ArgCons<H, T>&& cons) {
+  return cons.head;
+}
+
+template <typename H, typename T>
+inline T argCdr(ArgCons<H, T>&& cons) {
+  return cons.tail;
+}
+
+template <typename F, typename H, typename A, typename... Args>
+inline auto applyAccumulator(F const& fn, ArgCons<H, A>&& accum, Args&&... args)
+  -> decltype(applyAccumulator(fn, argCdr(forward<ArgCons<H, A>>(accum)), argCar(forward<ArgCons<H, A>>(accum)), forward<Args>(args)...)) {
+  return applyAccumulator(fn, argCdr(forward<ArgCons<H, A>>(accum)), argCar(forward<ArgCons<H, A>>(accum)), forward<Args>(args)...);
+}
+
+template <typename F, typename... Args>
+inline auto applyAccumulator(F const& fn, ArgNil const& /*accum*/, Args&&... args)
+  -> decltype(fn(forward<Args>(args)...)) {
+  return fn(forward<Args>(args)...);
+}
+
+template <typename F, typename T, typename A, typename H, typename... Rest>
+inline auto applyAccumulatorAndArgs(F const& fn, T const& transform, A&& accum, H&& head, Rest&&... rest)
+  -> decltype(applyAccumulatorAndArgs(fn, transform, argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...)) {
+
+  return applyAccumulatorAndArgs(fn, transform, argCons(transform(head), forward<A>(accum)), forward<Rest>(rest)...);
+}
+
+template <typename F, typename T, typename A>
+inline auto applyAccumulatorAndArgs(F const& fn, T const& /*transform*/, A&& accum)
+  -> decltype(applyAccumulator(fn, forward<A>(accum))) {
+
+  return applyAccumulator(fn, forward<A>(accum));
+}
+
+template <typename F, typename T, typename... Args>
+inline auto apply(F const& fn, T const& transform, Args&&... args)
+    -> decltype(applyAccumulatorAndArgs(fn, transform, argNil, forward<Args>(args)...)) {
+
+  return applyAccumulatorAndArgs(fn, transform, argNil, forward<Args>(args)...);
+}
+
+template <typename T> struct Box {
+  T val;
+  Box(T const& _val): val(_val) {}
+};
+struct Extract {
+  template <typename T> T const& operator()(Box<T> const& box) const {
+    return box.val;
+  }
+
+  template <typename T> T& operator()(Box<T>& box) const {
+    return box.val;
+  }
+};
+
+inline string foo(int a, float& b) {
+  b += 1.0f;
+  return lexical_cast<string>(a) + " " + lexical_cast<string>(b);
+}
+//struct Identity {
+//  template <typename T> T operator()(T value) const {
+//    return value;
+//  }
+//};
+
+//struct Bar {
+//  int& i;
+//  Bar(int& _i): i(_i) {}
+//};
+//inline void bar(Bar&& b) {
+//  b.i += 1;
+//  cout << b.i << "\n";
+//}
+
+template <typename T>
+struct Bar {
+  Bar(T) {}
+};
+
+template <typename T>
+inline void bat(Bar<T>) {
+}
+
+template <typename T>
+inline void bar(T&& x) {
+  bat(forward<T>(x));
+}
+
+inline void test() {
+  auto box = Box<float>(11.1f);
+  cout << apply(foo, Extract(), Box<int>(-7), box) << "\n"; cout << box.val << "\n";
+  //cout << applyAccumulatorAndArgs(foo, Extract(), argNil, box) << "\n"; cout << box.val << "\n";
+  //cout << applyAccumulatorAndArgs(foo, Extract(), argCons(box.val, argNil)) << "\n"; cout << box.val << "\n";
+  //cout << applyAccumulator(foo, argCons(box.val, argNil)) << "\n"; cout << box.val << "\n";
+  //cout << applyAccumulator(foo, argNil, box.val) << "\n"; cout << box.val << "\n";
+  //cout << foo(argCar(argCons(box.val, argNil))) << "\n"; cout << box.val << "\n";
+  //cout << argCdr(argCons(7, argNil));
+
+  //auto pack = argCons(box, argNil);
+  //auto& box2 = argCar(move(pack));
+  //box2.val += 1.0f;
+  //cout << box2.val;
+
+  //int i = 1;
+  //bar(argNil);
+  //cout << i << "\n";
+  //cout << "\n";
+}
+
+int main() {
+  test();
+  //activityMain([] () -> Activity& {
+  //  return runWithClock([] (Float const& _time, Trigger const& _loop) {
+
+  //    terminalUi(_loop, center(label(format(_time))));
+  //  });
+  //});
 }
