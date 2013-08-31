@@ -109,7 +109,7 @@ inline void defer(function<void ()> fn) {
   frames.back().members.push_back(fn);
 }
 
-class ValueBase {
+class ValueBase : noncopyable {
   mutable boost::signals2::signal<void ()> sig;
 
  protected:
@@ -119,6 +119,9 @@ class ValueBase {
 
  public:
   using ListenerHandle = connection;
+
+  ValueBase() = default;
+  ValueBase(ValueBase&&) = delete;
 
   virtual ~ValueBase();
 
@@ -220,7 +223,7 @@ template <typename F, typename... Args>
 inline auto trackApply(F&& fn, Args const&... args)
   -> Value<decltype(applyToTransformedArgs(fn, ValueGet(), args...))>& {
 
-  auto getResult = [&]() {
+  auto getResult = [&,fn]() {
     return applyToTransformedArgs(fn, ValueGet(), args...);
   };
 
@@ -228,7 +231,7 @@ inline auto trackApply(F&& fn, Args const&... args)
 
   auto& _result = member<Value<T>>(getResult());
 
-  auto update = [&]() {
+  auto update = [&,getResult]() {
     _result.set(getResult());
   };
   listenToAll(update, args...);
@@ -238,12 +241,12 @@ inline auto trackApply(F&& fn, Args const&... args)
 
 template <typename T>
 Value<T>& operator+(Value<T> const& _l, Value<T> const& _r) {
-  return applyBinary(plus<T>(), _l, _r);
+  return trackApply(plus<T>(), _l, _r);
 }
 
 template <typename T>
 Value<T>& operator/(Value<T> const& _l, Value<T> const& _r) {
-  return applyBinary(divides<T>(), _l, _r);
+  return trackApply(divides<T>(), _l, _r);
 }
 
 using Trigger = Value<void>;
@@ -402,10 +405,10 @@ inline void terminalUi(Trigger const& _loop, Widget<Flexible, Flexible>& _widget
 }
 
 inline Widget<Flexible, Flexible>& center(Widget<Rigid, Rigid>& _child) {
-  auto& _x = member<Integer>();
-  auto& _y = member<Integer>();
-  auto& _w = member<Integer>();
-  auto& _h = member<Integer>();
+  auto& _x = member<Integer>(0);
+  auto& _y = member<Integer>(0);
+  auto& _w = member<Integer>(0);
+  auto& _h = member<Integer>(0);
 
   track(_child.x.position, _x + _w / constant(2));
   track(_child.y.position, _y + _h / constant(2));
