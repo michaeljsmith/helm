@@ -351,15 +351,15 @@ inline Activity& runWithClock(function<void (Float const& time, Trigger const& l
   return member<ActivityImpl>(_time, _loop);
 }
 
-struct Renderable : noncopyable {
-  virtual ~Renderable();
-  virtual void render() const = 0;
+struct Drawable : noncopyable {
+  virtual ~Drawable();
+  virtual void draw() const = 0;
 };
 
-Renderable::~Renderable() {}
+Drawable::~Drawable() {}
 
 template <template <typename> class X, template <typename> class Y>
-using Widget = Layoutable<Integer, Renderable const&, X, Y>;
+using Widget = Layoutable<Integer, Drawable const&, X, Y>;
 
 inline Size<int>& terminalSize() {
   struct winsize ws;
@@ -399,7 +399,7 @@ inline void terminalUi(Trigger const& _loop, Widget<Flexible, Flexible>& _widget
   track(_widget.y.size, _size.y);
 
   listen(_loop, [&]() {
-    _widget.payload.render();
+    _widget.payload.draw();
     refresh();
   });
 }
@@ -420,7 +420,7 @@ inline Widget<Flexible, Flexible>& center(Widget<Rigid, Rigid>& _child) {
 }
 
 inline Widget<Rigid, Rigid>& label(String const& _text) {
-  class RenderableImpl : public Renderable {
+  class RenderableImpl : public Drawable {
     String const& text;
     Integer& x;
     Integer& y;
@@ -431,7 +431,7 @@ inline Widget<Rigid, Rigid>& label(String const& _text) {
     RenderableImpl(String const& t, Integer& x_, Integer& y_, Integer& w_, Integer& h_)
         : text(t), x(x_), y(y_), w(w_), h(h_) {}
 
-    virtual void render() const {
+    virtual void draw() const {
       mvaddstr(x.get(), y.get(), text.get().c_str());
     }
   };
