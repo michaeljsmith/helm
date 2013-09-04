@@ -352,11 +352,8 @@ inline Activity& runWithClock(function<void (Float const& time, Trigger const& l
 }
 
 struct Drawable : noncopyable {
-  virtual ~Drawable();
-  virtual void draw() const = 0;
+  function <void ()> draw;
 };
-
-Drawable::~Drawable() {}
 
 template <template <typename> class X, template <typename> class Y>
 using Widget = Layoutable<Integer, Drawable const&, X, Y>;
@@ -420,29 +417,18 @@ inline Widget<Flexible, Flexible>& center(Widget<Rigid, Rigid>& _child) {
 }
 
 inline Widget<Rigid, Rigid>& label(String const& _text) {
-  class RenderableImpl : public Drawable {
-    String const& text;
-    Integer& x;
-    Integer& y;
-
-   public:
-    Integer& w;
-    Integer& h;
-    RenderableImpl(String const& t, Integer& x_, Integer& y_, Integer& w_, Integer& h_)
-        : text(t), x(x_), y(y_), w(w_), h(h_) {}
-
-    virtual void draw() const {
-      mvaddstr(x.get(), y.get(), text.get().c_str());
-    }
-  };
-
   auto& _x = member<Integer>();
   auto& _y = member<Integer>();
   auto& _w = member<Integer>();
   auto& _h = member<Integer>();
 
+  auto& _drawable = member<Drawable>();
+  _drawable.draw = [&]() {
+    mvaddstr(_x.get(), _y.get(), _text.get().c_str());
+  };
+
   return member<Widget<Rigid, Rigid>>(
-      member<RenderableImpl>(_text, _x, _y, _w, _h),
+      _drawable,
       member<Rigid<Integer>>(_x, _w),
       member<Rigid<Integer>>(_y, _h));
 }
