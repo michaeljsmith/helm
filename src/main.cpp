@@ -10,6 +10,7 @@
 #include <boost/signals2.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
+#include "quadtree.h"
 
 using namespace std;
 using boost::signals2::connection;
@@ -280,6 +281,12 @@ inline Size<T> size(T const& x, T const& y) {
 }
 
 template <typename T>
+struct Sizeable {
+  Size<T>& size;
+  Sizeable(Size<T>& _size): size(_size) {}
+};
+
+template <typename T>
 struct Positionable : noncopyable {
   T& position;
   Positionable(T& _p): position(_p) {}
@@ -433,11 +440,28 @@ inline Widget<Rigid, Rigid>& label(String const& _text) {
       member<Rigid<Integer>>(_y, _h));
 }
 
-int main() {
-  activityMain([] () -> Activity& {
-    return runWithClock([] (Float const& _time, Trigger const& _loop) {
+struct Renderer {
+  function<void ()> render;
+};
 
-      terminalUi(_loop, center(label(format(_time))));
-    });
-  });
+template <typename T>
+struct SizeableRenderer : public Sizeable<T>, public Renderer {
+  SizeableRenderer(Size<T>& _size): Sizeable<T>(_size) {}
+};
+
+//template <typename T>
+//inline SizeableRenderer<T>& spaceRenderer(Queriable2D<T, Renderable>& renderableDatabase) {
+//  //auto& _filter = filter(renderableDatabase, 
+//  //auto& _renderer = member<SizeableRenderer<T>>();
+//  //_renderer.render = 
+//}
+
+int main() {
+  testQuadTree();
+  //activityMain([] () -> Activity& {
+  //  return runWithClock([] (Float const& _time, Trigger const& _loop) {
+
+  //    terminalUi(_loop, center(label(format(_time))));
+  //  });
+  //});
 }
