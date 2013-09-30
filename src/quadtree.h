@@ -2,6 +2,7 @@
 #define __QUAD_TREE_H__
 
 #include <set>
+#include <memory>
 
 template <typename C, typename T>
 class QuadTree {
@@ -13,8 +14,41 @@ class QuadTree {
   };
 
   template <typename Visitor>
-  void visit(Area const& area, Visitor const& visitor) {
-    asdf();
+  void visit(Area const& area, Visitor&& visitor) {
+    VisitRecurser<Visitor>(area, visitor)(root, rootScale(), rootOffsetX(), rootOffsetY());
+  }
+
+ private:
+  template <typename U> using shared_ptr = std::shared_ptr<U>;
+
+  struct Node {
+  };
+
+  shared_ptr<Node> root;
+
+  template <typename Visitor>
+  struct VisitRecurser {
+    Area const& area;
+    Visitor& visitor;
+
+    VisitRecurser(Area const& _area, Visitor& _visitor): visitor(_visitor), area(_area) {
+    }
+
+    void visitRecurse(shared_ptr<Node> const& node, Coord scale, Coord x, Coord y) {
+      asdf();
+    }
+  };
+
+  Coord rootScale() {
+    return (1 << rootScaleExponent);
+  }
+
+  Coord rootOffsetX() {
+    return (1 << rootScaleExponent) * rootOffsetIndexX;
+  }
+
+  Coord rootOffsetY() {
+    return (1 << rootScaleExponent) * rootOffsetIndexY;
   }
 };
 

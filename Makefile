@@ -1,7 +1,7 @@
 CXX=clang++
 #CXX=g++
-CXXFLAGS=-g --std=c++11 --stdlib=libc++ -Werror -Weverything -pedantic -Wno-c++98-compat -Wno-padded -Wno-float-equal -Wno-global-constructors -Wno-exit-time-destructors `sdl-config --cflags`
-LDFLAGS=-g --std=c++11 --stdlib=libc++ -Werror -Weverything -lpthread -lboost_signals-mt -lcurses
+CXXFLAGS=-g --std=c++11 -Werror -Weverything -pedantic -Wno-c++98-compat -Wno-padded -Wno-float-equal -Wno-global-constructors -Wno-exit-time-destructors
+#LDFLAGS=-g --std=c++11 --stdlib=libc++ -Werror -Weverything -lpthread -lboost_signals-mt -lcurses
 
 # Basic configuration variables.
 module_name=helm
