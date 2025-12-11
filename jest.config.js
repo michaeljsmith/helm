@@ -1,0 +1,7 @@
+export default {
+  testMatch: ["<rootDir>/**/*.test.ts"],
+  preset: 'ts-jest/presets/default-esm',
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
+}

@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    // ECMAScript target version
+    "target": "es2020",
+    
+    // Module system
+    "module": "node16",
+    "moduleResolution": "node16",
+    
+    // Library definitions
+    "lib": ["es2022"],
+    
+    // Strict type-checking options
+    "strict": true,
+    
+    // Module resolution
+    "esModuleInterop": true,
+    "moduleDetection": "force",
+    
+    // Emit options
+    "declaration": false,
+    "outDir": "out",
+    
+    // Advanced options
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "isolatedModules": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".next"
+  ]
+}

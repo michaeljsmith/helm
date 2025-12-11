@@ -1,0 +1,125 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Card creates empty model 1`] = `
+{
+  "models": [],
+  "type": "union-model",
+}
+`;
+
+exports[`Card creates nested transforms 1`] = `
+{
+  "model": {
+    "model": {
+      "tag": "tag",
+      "type": "tag-model",
+    },
+    "transform": {
+      "position": Float64Array [
+        0,
+        1,
+        0,
+      ],
+      "rotation": Float64Array [
+        1,
+        0,
+        0,
+        0,
+      ],
+    },
+    "type": "transformed-model",
+  },
+  "transform": {
+    "position": Float64Array [
+      1,
+      0,
+      0,
+    ],
+    "rotation": Float64Array [
+      1,
+      0,
+      0,
+      0,
+    ],
+  },
+  "type": "transformed-model",
+}
+`;
+
+exports[`Card creates tag model 1`] = `
+{
+  "tag": "tag",
+  "type": "tag-model",
+}
+`;
+
+exports[`Card creates transformed model 1`] = `
+{
+  "model": {
+    "tag": "tag",
+    "type": "tag-model",
+  },
+  "transform": {
+    "position": Float64Array [
+      1,
+      0,
+      0,
+    ],
+    "rotation": Float64Array [
+      1,
+      0,
+      0,
+      0,
+    ],
+  },
+  "type": "transformed-model",
+}
+`;
+
+exports[`Card creates two models 1`] = `
+{
+  "models": [
+    {
+      "tag": "tag1",
+      "type": "tag-model",
+    },
+    {
+      "tag": "tag2",
+      "type": "tag-model",
+    },
+  ],
+  "type": "union-model",
+}
+`;
+
+exports[`Card creates two transformed models 1`] = `
+{
+  "model": {
+    "models": [
+      {
+        "tag": "tag1",
+        "type": "tag-model",
+      },
+      {
+        "tag": "tag2",
+        "type": "tag-model",
+      },
+    ],
+    "type": "union-model",
+  },
+  "transform": {
+    "position": Float64Array [
+      1,
+      0,
+      0,
+    ],
+    "rotation": Float64Array [
+      1,
+      0,
+      0,
+      0,
+    ],
+  },
+  "type": "transformed-model",
+}
+`;

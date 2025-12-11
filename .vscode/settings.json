@@ -1,0 +1,11 @@
+{
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "css.lint.validProperties": [
+    "composes"
+  ],
+  "css.lint.emptyRules": "ignore",
+  "typescript.preferences.importModuleSpecifierEnding": "js"
+}
