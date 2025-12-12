@@ -1,8 +1,8 @@
 import { checkExists } from "../utils/preconditions/check-exists.js";
 import { Vector3 } from "./vector.js";
 
-const AabbDimensionsBrand = { __IS_AAB_DIMENSIONS__: true };
-export type AabDimensions = Vector3 & typeof AabbDimensionsBrand;
+type AabbDimensionsBrand = { __IS_AAB_DIMENSIONS__: true };
+export type AabDimensions = Vector3 & AabbDimensionsBrand;
 export const aabDimensionsWith = (
   width: number,
   height: number,

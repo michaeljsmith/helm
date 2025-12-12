@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`Card creates empty model 1`] = `
+exports[`newModel creates empty model 1`] = `
 {
   "models": [],
   "type": "union-model",
 }
 `;
 
-exports[`Card creates nested transforms 1`] = `
+exports[`newModel creates nested transforms 1`] = `
 {
   "model": {
     "model": {
@@ -46,14 +46,14 @@ exports[`Card creates nested transforms 1`] = `
 }
 `;
 
-exports[`Card creates tag model 1`] = `
+exports[`newModel creates tag model 1`] = `
 {
   "tag": "tag",
   "type": "tag-model",
 }
 `;
 
-exports[`Card creates transformed model 1`] = `
+exports[`newModel creates transformed model 1`] = `
 {
   "model": {
     "tag": "tag",
@@ -76,7 +76,7 @@ exports[`Card creates transformed model 1`] = `
 }
 `;
 
-exports[`Card creates two models 1`] = `
+exports[`newModel creates two models 1`] = `
 {
   "models": [
     {
@@ -92,7 +92,7 @@ exports[`Card creates two models 1`] = `
 }
 `;
 
-exports[`Card creates two transformed models 1`] = `
+exports[`newModel creates two transformed models 1`] = `
 {
   "model": {
     "models": [

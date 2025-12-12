@@ -1,7 +1,7 @@
 import { Model } from "../model.js";
 import { ModelCreationContext } from "./model-creation-context.js";
 
-export const createModel = <Tag>(
+export const newModel = <Tag>(
   def: (context: ModelCreationContext<Tag>) => void,
 ): Model<Tag> => {
   const context: ModelCreationContext<Tag> = {

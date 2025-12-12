@@ -1,3 +1,3 @@
-const foo = (x: number) => {
+const _foo = (x: number) => {
   return x * 2;
 };
