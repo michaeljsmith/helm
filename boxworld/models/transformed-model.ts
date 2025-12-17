@@ -1,4 +1,4 @@
-import { RigidTransform } from '../../math/rigid-transform.js';
+import { RigidTransform } from "../../math/rigid-transform.js";
 import { Unwrap } from "./unwrap.js";
 
 export type TransformedModel<WrappedChild> = {

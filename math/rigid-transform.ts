@@ -1,5 +1,5 @@
-import { Point } from "./point.js";
-import { UnitQuaternion } from "./unit-quaternion.js";
+import { ORIGIN, Point } from "./point.js";
+import { IDENTITY_UNIT_QUATERNION, UnitQuaternion } from "./unit-quaternion.js";
 
 export type RigidTransform = {
   rotation: UnitQuaternion;
@@ -10,3 +10,8 @@ export const rigidTransformWith = (
   rotation: UnitQuaternion,
   position: Point,
 ): RigidTransform => ({ rotation, position });
+
+export const IDENTITY_RIGID = rigidTransformWith(
+  IDENTITY_UNIT_QUATERNION,
+  ORIGIN,
+);
