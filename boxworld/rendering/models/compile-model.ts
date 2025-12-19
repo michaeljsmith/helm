@@ -94,11 +94,11 @@ const addBox = (context: CompileModelContext, model: BoxModel): void => {
     dimensions[(axis + 2) % 3] = model.dimensions[2];
     for (let direction = 0; direction < 2; ++direction) {
       const normal = maybeNegateDirection(
-        direction === 2,
+        direction === 1,
         directionWith(normalElements[0], normalElements[1], normalElements[2]),
       );
       const right = maybeNegateDirection(
-        direction === 2,
+        direction === 1,
         directionWith(rightElements[0], rightElements[1], rightElements[2]),
       );
 

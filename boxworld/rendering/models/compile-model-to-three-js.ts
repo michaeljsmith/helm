@@ -1,10 +1,17 @@
-import { BufferAttribute, BufferGeometry } from "three";
+import {
+  BufferAttribute,
+  BufferGeometry,
+  Material,
+  MeshPhongMaterial,
+} from "three";
 import { Model } from "../../models/model.js";
 import { compileModel } from "./compile-model.js";
 
+const material = new MeshPhongMaterial({ color: 0x00ff00 });
+
 export const compileModelToThreeJs = (
   model: Model<unknown>,
-): BufferGeometry => {
+): { geometry: BufferGeometry; material: Material } => {
   const results = compileModel(model);
 
   const geometry = new BufferGeometry();
@@ -21,5 +28,5 @@ export const compileModelToThreeJs = (
     new BufferAttribute(new Float32Array(results.colors), 3),
   );
   geometry.setIndex(results.indices);
-  return geometry;
+  return { geometry, material };
 };

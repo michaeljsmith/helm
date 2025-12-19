@@ -15,7 +15,8 @@
   <div id="scene-parent"></div>
   <script type="module">
     import { mount } from "/boxworld/mount.js";
-    mount(document.querySelector("#scene-parent"));
+    import { world } from "/world.js";
+    mount(document.querySelector("#scene-parent"), world, () => ({}));
   </script>
 </body>
 
