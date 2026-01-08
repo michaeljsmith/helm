@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`applyLayout lays out series 1`] = `
+Set {
+  {
+    "size": [
+      1,
+      1,
+      2,
+    ],
+    "start": [
+      0,
+      0,
+      0,
+    ],
+  },
+  {
+    "size": [
+      2,
+      1,
+      1,
+    ],
+    "start": [
+      0,
+      0,
+      -2,
+    ],
+  },
+}
+`;
+
+exports[`applyLayout lays out single literal 1`] = `
+Set {
+  {
+    "size": [
+      1,
+      1,
+      2,
+    ],
+    "start": [
+      0,
+      0,
+      0,
+    ],
+  },
+}
+`;
