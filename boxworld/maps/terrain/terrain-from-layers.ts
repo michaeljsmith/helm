@@ -8,9 +8,8 @@ import { Terrain } from "./terrain.js";
 export const terrainFromLayers = (layers: TerrainLayer[]): Terrain => {
   const { origin, dimensions } = boundariesOfLayers(layers);
 
-  const left = origin[0];
+  const [left, far] = origin;
   const right = left + dimensions[0];
-  const far = origin[1];
   const near = far + dimensions[1];
 
   const heights: TerrainHeight[] = [];
