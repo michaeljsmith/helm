@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`compileTerrainChunk compiles terrain chunk with multiple tiles 1`] = `
+exports[`compileTerrainChunk compiles terrain chunk with multiple cells 1`] = `
 {
   "bounds": {
     "center": Float64Array [
@@ -157,7 +157,7 @@ exports[`compileTerrainChunk compiles terrain chunk with multiple tiles 1`] = `
 }
 `;
 
-exports[`compileTerrainChunk compiles terrain chunk with single tile 1`] = `
+exports[`compileTerrainChunk compiles terrain chunk with single cell 1`] = `
 {
   "bounds": {
     "center": Float64Array [

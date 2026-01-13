@@ -3,7 +3,7 @@ import { terrainFromLayers } from "../../maps/terrain/terrain-from-layers.js";
 import { compileTerrainChunk } from "./compile-terrain-chunk.js";
 
 describe("compileTerrainChunk", () => {
-  it("compiles terrain chunk with single tile", () => {
+  it("compiles terrain chunk with single cell", () => {
     const layerLayout = newLayer((_x, _y) => 1);
     const layer = layerLayout.construct([1, 0, 2], [1, 1, 1]);
     const terrain = terrainFromLayers([layer]);
@@ -11,7 +11,7 @@ describe("compileTerrainChunk", () => {
     expect(chunk).toMatchSnapshot();
   });
 
-  it("compiles terrain chunk with multiple tiles", () => {
+  it("compiles terrain chunk with multiple cells", () => {
     const layerLayout = newLayer((x, y) => x + y);
     const layer = layerLayout.construct([1, 0, 0], [2, 1, 2]);
     const terrain = terrainFromLayers([layer]);
