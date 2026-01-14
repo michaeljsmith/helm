@@ -2,18 +2,6 @@
 
 exports[`compileTerrainChunk compiles terrain chunk with multiple cells 1`] = `
 {
-  "bounds": {
-    "center": Float64Array [
-      1,
-      -1,
-      0,
-    ],
-    "dimensions": Float64Array [
-      2,
-      0,
-      2,
-    ],
-  },
   "colors": [
     0,
     1,
@@ -159,18 +147,6 @@ exports[`compileTerrainChunk compiles terrain chunk with multiple cells 1`] = `
 
 exports[`compileTerrainChunk compiles terrain chunk with single cell 1`] = `
 {
-  "bounds": {
-    "center": Float64Array [
-      1.5,
-      1,
-      2.5,
-    ],
-    "dimensions": Float64Array [
-      1,
-      0,
-      1,
-    ],
-  },
   "colors": [
     0,
     1,
