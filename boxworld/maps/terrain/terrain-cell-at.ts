@@ -7,13 +7,13 @@ export const terrainCellAt = (
   x: number,
   z: number,
 ): TerrainHeight => {
-  const [left, far] = terrain.origin;
-  const [width, depth] = terrain.dimensions;
+  const [left, far] = terrain.bounds.origin;
+  const [width, depth] = terrain.bounds.dimensions;
   checkThat(x >= left);
   checkThat(x < left + width);
   checkThat(z >= far);
   checkThat(z < far + depth);
-  const relativeX = x - terrain.origin[0];
-  const relativeZ = z - terrain.origin[1];
+  const relativeX = x - terrain.bounds.origin[0];
+  const relativeZ = z - terrain.bounds.origin[1];
   return terrain.heights[relativeZ * width + relativeX];
 };

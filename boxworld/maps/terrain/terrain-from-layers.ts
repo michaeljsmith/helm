@@ -21,7 +21,7 @@ export const terrainFromLayers = (layers: TerrainLayer[]): Terrain => {
     }
   }
 
-  return { origin, dimensions, heights };
+  return { bounds: { origin, dimensions }, heights };
 };
 
 const boundariesOfLayers = (

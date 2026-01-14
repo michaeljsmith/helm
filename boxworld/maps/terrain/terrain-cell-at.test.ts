@@ -4,8 +4,7 @@ import { Terrain } from "./terrain.js";
 describe("terrainCellAt", () => {
   it("looks up cells", () => {
     const terrain: Terrain = {
-      origin: [1, 3],
-      dimensions: [2, 2],
+      bounds: { origin: [1, 3], dimensions: [2, 2] },
       heights: [1, 2, 3, 4],
     };
     expect(terrainCellAt(terrain, 1, 3)).toBe(1);
@@ -16,8 +15,7 @@ describe("terrainCellAt", () => {
 
   it("catches out-of-bounds lookup", () => {
     const terrain: Terrain = {
-      origin: [1, 3],
-      dimensions: [1, 1],
+      bounds: { origin: [1, 3], dimensions: [1, 1] },
       heights: [1],
     };
     expect(() => terrainCellAt(terrain, 2, 3)).toThrow();

@@ -1,7 +1,6 @@
+import { TerrainBounds } from "../../maps/terrain/terrain-bounds.js";
 import { terrainCellAt } from "../../maps/terrain/terrain-cell-at.js";
-import { TerrainDimensions } from "../../maps/terrain/terrain-dimensions.js";
 import { TERRAIN_HOLE } from "../../maps/terrain/terrain-height.js";
-import { TerrainPosition } from "../../maps/terrain/terrain-position.js";
 import { Terrain } from "../../maps/terrain/terrain.js";
 import { TerrainRenderChunk } from "./terrain-render-chunk.js";
 
@@ -9,16 +8,15 @@ const cellSize = 1.0;
 
 export const compileTerrainChunk = (
   terrain: Terrain,
-  cellOrigin: TerrainPosition,
-  cellDimensions: TerrainDimensions,
-): TerrainRenderChunk | undefined => {
+  bounds: TerrainBounds,
+): TerrainRenderChunk => {
   const positions: number[] = [];
   const normals: number[] = [];
   const colors: number[] = [];
   const indices: number[] = [];
 
-  const [left, far] = cellOrigin;
-  const [width, depth] = cellDimensions;
+  const [left, far] = bounds.origin;
+  const [width, depth] = bounds.dimensions;
   const right = left + width;
   const near = far + depth;
   for (let z = far; z < near; ++z) {
