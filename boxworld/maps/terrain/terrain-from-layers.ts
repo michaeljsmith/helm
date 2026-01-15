@@ -1,9 +1,16 @@
 import { checkThat } from "../../../utils/preconditions/check-that.js";
+import { converted, Layout } from "../layouts/layout.js";
 import { TerrainDimensions } from "./terrain-dimensions.js";
-import { TerrainHeight } from "./terrain-height.js";
+import { TERRAIN_HOLE, TerrainHeight } from "./terrain-height.js";
 import { TerrainLayer } from "./terrain-layer.js";
 import { TerrainPosition } from "./terrain-position.js";
 import { Terrain } from "./terrain.js";
+
+export const terrain = (layers: Layout<TerrainLayer>) =>
+  converted<TerrainLayer, Terrain>(
+    (layers) => terrainFromLayers([...layers]),
+    layers,
+  );
 
 export const terrainFromLayers = (layers: TerrainLayer[]): Terrain => {
   const { origin, dimensions } = boundariesOfLayers(layers);
@@ -12,11 +19,33 @@ export const terrainFromLayers = (layers: TerrainLayer[]): Terrain => {
   const right = left + dimensions[0];
   const near = far + dimensions[1];
 
+  // Clear the terrain.
   const heights: TerrainHeight[] = [];
+  for (let x = left; x < right; ++x) {
+    for (let z = far; z < near; ++z) {
+      heights[(z - far) * dimensions[0] + (x - left)] = TERRAIN_HOLE;
+    }
+  }
+
+  // Render each layer into the terrain.
   for (const layer of layers) {
-    for (let x = left; x < right; ++x) {
-      for (let z = far; z < near; ++z) {
-        heights[(z - far) * dimensions[0] + (x - left)] = layer.heightAt(x, z);
+    const [layerLeft, layerFar] = layer.origin;
+    const layerRight = layerLeft + layer.dimensions[0];
+    const layerNear = layerFar + layer.dimensions[1];
+    for (let x = layerLeft; x < layerRight; ++x) {
+      for (let z = layerFar; z < layerNear; ++z) {
+        const index = (z - far) * dimensions[0] + (x - left);
+        const existingHeight = heights[index];
+        const layerHeight = layer.heightAt(x, z);
+        heights[index] =
+          // If The layer has a hole here, set a hole.
+          layerHeight === TERRAIN_HOLE
+            ? TERRAIN_HOLE
+            : // Else if there is currently a hole here, prefer the new value.
+              existingHeight === TERRAIN_HOLE
+              ? layerHeight
+              : // Else sum the heights.
+                existingHeight + layerHeight;
       }
     }
   }

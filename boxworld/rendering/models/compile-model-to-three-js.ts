@@ -7,7 +7,7 @@ import {
 import { Model } from "../../models/model.js";
 import { compileModel } from "./compile-model.js";
 
-const material = new MeshPhongMaterial({ color: 0x00ff00 });
+const material = new MeshPhongMaterial({ color: 0x0000ff });
 
 export const compileModelToThreeJs = (
   model: Model<unknown>,

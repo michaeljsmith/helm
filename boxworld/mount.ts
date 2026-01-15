@@ -10,9 +10,12 @@ import {
   WebGLRenderer,
 } from "three";
 import { Artifact } from "./artifacts/artifact.js";
+import { TerrainChunk } from "./maps/terrain/terrain-chunk.js";
+import { Terrain } from "./maps/terrain/terrain.js";
 import { Model } from "./models/model.js";
 import { compileModelToThreeJs } from "./rendering/models/compile-model-to-three-js.js";
 import { ModelInstance } from "./rendering/models/instances/model-instance.js";
+import { compileTerrainChunkToThreeJs } from "./rendering/terrain/compile-terrain-chunk-to-three-js.js";
 
 export const mount = <State>(
   parentDiv: HTMLDivElement,
@@ -36,13 +39,27 @@ export const mount = <State>(
   renderer.setAnimationLoop(() => {
     const artifacts = world(state);
     const modelInstances: ModelInstance[] = [];
+    const terrainChunks: TerrainChunk[] = [];
     for (const artfifact of artifacts) {
-      if (artfifact.type === "model-instance-artifact") {
-        modelInstances.push(artfifact.instance);
+      switch (artfifact.type) {
+        case "model-instance-artifact":
+          {
+            modelInstances.push(artfifact.instance);
+          }
+          break;
+
+        case "terrain-chunk-artifact":
+          {
+            terrainChunks.push(artfifact.chunk);
+          }
+          break;
+
+        default:
+          throw ((x: never) => new Error("Unexpected " + x))(artfifact);
       }
     }
 
-    sceneUpdater(modelInstances);
+    sceneUpdater(modelInstances, terrainChunks);
 
     renderer.render(scene, camera);
   });
@@ -66,18 +83,22 @@ export const mount = <State>(
 
 const newSceneUpdater = (
   scene: Scene,
-): ((modelInstances: ModelInstance[]) => void) => {
+): ((
+  modelInstances: ModelInstance[],
+  terrainChunks: TerrainChunk[],
+) => void) => {
   const currentMeshes: Mesh[] = [];
-  const geometryAccessor = newGeometryAccessor();
+  const modelGeometryAccessor = newModelGeometryAccessor();
+  const terrainChunkGeometryAccessor = newTerrainChunkGeometryAccessor();
 
-  return (modelInstances) => {
+  return (modelInstances, terrainChunks) => {
     for (const currentMesh of currentMeshes) {
       scene.remove(currentMesh);
     }
     currentMeshes.splice(0, currentMeshes.length);
 
     for (const modelInstance of modelInstances) {
-      const { geometry, material } = geometryAccessor(modelInstance.model);
+      const { geometry, material } = modelGeometryAccessor(modelInstance.model);
       const mesh = new Mesh(geometry, material);
       const q = modelInstance.transform.rotation;
       mesh.applyQuaternion(new Quaternion(q[3], q[0], q[1], q[2]));
@@ -86,17 +107,25 @@ const newSceneUpdater = (
       scene.add(mesh);
       currentMeshes.push(mesh);
     }
+
+    for (const terrainChunk of terrainChunks) {
+      const { geometry, material } = terrainChunkGeometryAccessor(terrainChunk);
+      const mesh = new Mesh(geometry, material);
+      scene.add(mesh);
+      currentMeshes.push(mesh);
+    }
   };
 };
 
-const newGeometryAccessor = (): ((model: Model<unknown>) => {
+type GeometryAndMaterial = {
   geometry: BufferGeometry;
   material: Material;
-}) => {
-  const geometryCache = new WeakMap<
-    Model<unknown>,
-    { geometry: BufferGeometry; material: Material }
-  >();
+};
+
+const newModelGeometryAccessor = (): ((
+  model: Model<unknown>,
+) => GeometryAndMaterial) => {
+  const geometryCache = new WeakMap<Model<unknown>, GeometryAndMaterial>();
   return (model) => {
     let results = geometryCache.get(model);
     if (results === undefined) {
@@ -105,5 +134,36 @@ const newGeometryAccessor = (): ((model: Model<unknown>) => {
     }
 
     return results;
+  };
+};
+
+const newTerrainChunkGeometryAccessor = (): ((
+  terrainChunk: TerrainChunk,
+) => GeometryAndMaterial) => {
+  const geometryCache = new WeakMap<
+    Terrain,
+    Map<string, GeometryAndMaterial>
+  >();
+
+  return (terrainChunk) => {
+    let chunkGeometriesForTerrain = geometryCache.get(terrainChunk.terrain);
+    if (chunkGeometriesForTerrain === undefined) {
+      chunkGeometriesForTerrain = new Map();
+      geometryCache.set(terrainChunk.terrain, chunkGeometriesForTerrain);
+    }
+
+    const [left, far] = terrainChunk.bounds.origin;
+    const [width, depth] = terrainChunk.bounds.dimensions;
+    const chunkKey = `${left},${far}:${width},${depth}`;
+    let chunkGeometry = chunkGeometriesForTerrain.get(chunkKey);
+    if (chunkGeometry === undefined) {
+      chunkGeometry = compileTerrainChunkToThreeJs(
+        terrainChunk.terrain,
+        terrainChunk.bounds,
+      );
+      chunkGeometriesForTerrain.set(chunkKey, chunkGeometry);
+    }
+
+    return chunkGeometry;
   };
 };
