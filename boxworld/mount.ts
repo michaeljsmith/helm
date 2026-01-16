@@ -61,6 +61,20 @@ export const mount = <State>(
 
     sceneUpdater(modelInstances, terrainChunks);
 
+    const cameraPosition = artifacts.camera.transform.position;
+    camera.position.set(
+      cameraPosition[0],
+      cameraPosition[1],
+      cameraPosition[2],
+    );
+    const cameraRotation = artifacts.camera.transform.rotation;
+    camera.quaternion.set(
+      cameraRotation[1],
+      cameraRotation[2],
+      cameraRotation[3],
+      cameraRotation[0],
+    );
+
     renderer.render(scene, camera);
   });
   parentDiv.appendChild(renderer.domElement);
@@ -73,12 +87,6 @@ export const mount = <State>(
 
   const ambientlight = new AmbientLight(0xffffff, 0.05);
   scene.add(ambientlight);
-
-  camera.position.z = -1.0;
-  camera.position.y = 1.0;
-  camera.position.x = -3;
-
-  camera.rotateY(-Math.PI / 2);
 };
 
 const newSceneUpdater = (

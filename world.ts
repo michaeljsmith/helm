@@ -1,5 +1,6 @@
 import { ArtifactSet } from "./boxworld/artifact-set.js";
 import { Artifact } from "./boxworld/artifacts/artifact.js";
+import { Camera } from "./boxworld/camera.js";
 import { color3With } from "./boxworld/color.js";
 import { flat } from "./boxworld/maps/layers/flat-layout.js";
 import { applyLayout } from "./boxworld/maps/layouts/apply-layout.js";
@@ -10,7 +11,9 @@ import { Terrain } from "./boxworld/maps/terrain/terrain.js";
 import { addModel } from "./boxworld/models/creation/add-model.js";
 import { newModel } from "./boxworld/models/creation/new-model.js";
 import { aabDimensionsWith } from "./math/aab-dimensions.js";
-import { IDENTITY_RIGID } from "./math/rigid-transform.js";
+import { pointWith } from "./math/point.js";
+import { IDENTITY_RIGID, rigidTransformWith } from "./math/rigid-transform.js";
+import { rotationAroundY } from "./math/rotation-around-axis.js";
 
 const terrains = [
   ...applyLayout(
@@ -26,8 +29,8 @@ const model = newModel((context) => {
   });
 });
 
-export const world = (): ArtifactSet => ({
-  artifacts: [
+export const world = (): ArtifactSet => {
+  const artifacts: Iterable<Artifact> = [
     ...artifactsForTerrain(terrains),
     {
       type: "model-instance-artifact",
@@ -36,8 +39,19 @@ export const world = (): ArtifactSet => ({
         transform: IDENTITY_RIGID,
       },
     },
-  ],
-});
+  ];
+
+  const cameraRotation = rotationAroundY(-Math.PI / 2);
+  const cameraPosition = pointWith(-3.0, 1.0, -1.0);
+
+  const camera: Camera = {
+    transform: rigidTransformWith(cameraRotation, cameraPosition),
+  };
+  return {
+    camera,
+    artifacts,
+  };
+};
 
 const artifactsForTerrain = function* (
   terrains: Iterable<Terrain>,
