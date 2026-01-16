@@ -28,8 +28,8 @@ export const compileTerrainChunk = (
 
       const i0 = positions.length / 3;
       for (let corner = 0; corner < 4; ++corner) {
-        const sideX = corner & 2;
-        const sideZ = (corner + 1) & 2;
+        const sideX = (corner & 2) >> 1;
+        const sideZ = ((corner + 1) & 2) >> 1;
         positions.push(
           (x + sideX) * cellSize,
           height * cellSize,

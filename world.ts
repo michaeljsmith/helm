@@ -41,8 +41,8 @@ export const world = (): ArtifactSet => {
     },
   ];
 
-  const cameraRotation = rotationAroundY(-Math.PI / 2);
-  const cameraPosition = pointWith(-3.0, 1.0, -1.0);
+  const cameraRotation = rotationAroundY((-1 * Math.PI) / 4);
+  const cameraPosition = pointWith(-2.0, 1.0, 2.0);
 
   const camera: Camera = {
     transform: rigidTransformWith(cameraRotation, cameraPosition),
