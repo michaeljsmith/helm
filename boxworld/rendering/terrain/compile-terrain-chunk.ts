@@ -27,13 +27,13 @@ export const compileTerrainChunk = (
       }
 
       const i0 = positions.length / 3;
-      for (let corner = 0; corner < 3; ++corner) {
-        const sideX = corner & 1;
-        const sideY = corner >> 1;
+      for (let corner = 0; corner < 4; ++corner) {
+        const sideX = corner & 2;
+        const sideZ = (corner + 1) & 2;
         positions.push(
           (x + sideX) * cellSize,
           height * cellSize,
-          (z + sideY) * cellSize,
+          (z + sideZ) * cellSize,
         );
         normals.push(0, 1, 0);
         colors.push(0, 1, 0);

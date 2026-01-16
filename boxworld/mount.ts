@@ -9,7 +9,7 @@ import {
   Scene,
   WebGLRenderer,
 } from "three";
-import { Artifact } from "./artifacts/artifact.js";
+import { ArtifactSet } from "./artifact-set.js";
 import { TerrainChunk } from "./maps/terrain/terrain-chunk.js";
 import { Terrain } from "./maps/terrain/terrain.js";
 import { Model } from "./models/model.js";
@@ -19,7 +19,7 @@ import { compileTerrainChunkToThreeJs } from "./rendering/terrain/compile-terrai
 
 export const mount = <State>(
   parentDiv: HTMLDivElement,
-  world: (state: State) => Iterable<Artifact>,
+  world: (state: State) => ArtifactSet,
   init: () => State,
 ) => {
   const state = init();
@@ -40,7 +40,7 @@ export const mount = <State>(
     const artifacts = world(state);
     const modelInstances: ModelInstance[] = [];
     const terrainChunks: TerrainChunk[] = [];
-    for (const artfifact of artifacts) {
+    for (const artfifact of artifacts.artifacts) {
       switch (artfifact.type) {
         case "model-instance-artifact":
           {

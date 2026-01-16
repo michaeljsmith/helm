@@ -1,3 +1,4 @@
+import { ArtifactSet } from "./boxworld/artifact-set.js";
 import { Artifact } from "./boxworld/artifacts/artifact.js";
 import { color3With } from "./boxworld/color.js";
 import { flat } from "./boxworld/maps/layers/flat-layout.js";
@@ -25,16 +26,18 @@ const model = newModel((context) => {
   });
 });
 
-export const world = (): Iterable<Artifact> => [
-  {
+export const world = (): ArtifactSet => ({
+  artifacts: [
     ...artifactsForTerrain(terrains),
-    type: "model-instance-artifact",
-    instance: {
-      model,
-      transform: IDENTITY_RIGID,
+    {
+      type: "model-instance-artifact",
+      instance: {
+        model,
+        transform: IDENTITY_RIGID,
+      },
     },
-  },
-];
+  ],
+});
 
 const artifactsForTerrain = function* (
   terrains: Iterable<Terrain>,
