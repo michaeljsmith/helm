@@ -8,22 +8,22 @@ describe("terrainFromLayers", () => {
     const layerLayout = newLayer((x, y) => 10 * x + y);
     const layer = layerLayout.construct([1, 0, 2], [1, 1, 1]);
     const terrain = terrainFromLayers([layer]);
-    expect(terrain.bounds.origin).toEqual([1, 2]);
+    expect(terrain.bounds.origin).toEqual([1, 1]);
     expect(terrain.bounds.dimensions).toEqual([1, 1]);
-    const height = terrainCellAt(terrain, 1, 2);
-    expect(height).toBe(12);
+    const height = terrainCellAt(terrain, 1, 1);
+    expect(height).toBe(11);
   });
 
   it("constructs terrain from single layer with larger size", () => {
     const layerLayout = newLayer((x, y) => 10 * x + y);
     const layer = layerLayout.construct([1, 0, 2], [2, 1, 2]);
     const terrain = terrainFromLayers([layer]);
-    expect(terrain.bounds.origin).toEqual([0, 1]);
+    expect(terrain.bounds.origin).toEqual([0, 0]);
     expect(terrain.bounds.dimensions).toEqual([2, 2]);
+    expect(terrainCellAt(terrain, 0, 0)).toBe(0);
     expect(terrainCellAt(terrain, 0, 1)).toBe(1);
-    expect(terrainCellAt(terrain, 0, 2)).toBe(2);
+    expect(terrainCellAt(terrain, 1, 0)).toBe(10);
     expect(terrainCellAt(terrain, 1, 1)).toBe(11);
-    expect(terrainCellAt(terrain, 1, 2)).toBe(12);
   });
 
   it("constructs terrain from multiple layers", () => {
@@ -32,10 +32,10 @@ describe("terrainFromLayers", () => {
     const layerLayout2 = newLayer((x, y) => 10 * x + y);
     const layer2 = layerLayout2.construct([1, 0, 4], [1, 1, 1]);
     const terrain = terrainFromLayers([layer1, layer2]);
-    expect(terrain.bounds.origin).toEqual([1, 2]);
+    expect(terrain.bounds.origin).toEqual([1, 1]);
     expect(terrain.bounds.dimensions).toEqual([1, 3]);
-    const height = terrainCellAt(terrain, 1, 2);
-    expect(height).toBe(12);
+    const height = terrainCellAt(terrain, 1, 1);
+    expect(height).toBe(11);
   });
 
   it("sums multiple layers", () => {
@@ -44,7 +44,7 @@ describe("terrainFromLayers", () => {
     const layerLayout2 = newLayer((_x, _y) => 2);
     const layer2 = layerLayout2.construct([1, 0, 2], [1, 1, 1]);
     const terrain = terrainFromLayers([layer1, layer2]);
-    const height = terrainCellAt(terrain, 1, 2);
+    const height = terrainCellAt(terrain, 1, 1);
     expect(height).toBe(3);
   });
 
@@ -54,7 +54,7 @@ describe("terrainFromLayers", () => {
     const layerLayout2 = newLayer((_x, _y) => 2);
     const layer2 = layerLayout2.construct([1, 0, 2], [1, 1, 1]);
     const terrain = terrainFromLayers([layer1, layer2]);
-    const height = terrainCellAt(terrain, 1, 2);
+    const height = terrainCellAt(terrain, 1, 1);
     expect(height).toBe(2);
   });
 
@@ -64,7 +64,7 @@ describe("terrainFromLayers", () => {
     const layerLayout2 = newLayer((_x, _y) => TERRAIN_HOLE);
     const layer2 = layerLayout2.construct([1, 0, 2], [1, 1, 1]);
     const terrain = terrainFromLayers([layer1, layer2]);
-    const height = terrainCellAt(terrain, 1, 2);
+    const height = terrainCellAt(terrain, 1, 1);
     expect(height).toBe(TERRAIN_HOLE);
   });
 });

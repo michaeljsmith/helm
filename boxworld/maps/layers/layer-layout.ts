@@ -12,7 +12,7 @@ export const layer = (
     const [startX, _startY, startZ] = start;
     const layerSize: [number, number] = [width, depth];
     const left = startX - (width >> 1);
-    const far = startZ - depth + 1;
+    const far = startZ - depth;
     const origin: [number, number] = [left, far];
     const layer: TerrainLayer = {
       origin,
