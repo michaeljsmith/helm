@@ -17,7 +17,7 @@ import { rotationAroundY } from "./math/rotation-around-axis.js";
 
 const terrains = [
   ...applyLayout(
-    terrain(series([fixed([2, 1, 2], flat(-1)), fixed([2, 1, 2], flat(0))])),
+    terrain(series([fixed([2, 2], flat(-1)), fixed([2, 2], flat(0))])),
   ),
 ];
 

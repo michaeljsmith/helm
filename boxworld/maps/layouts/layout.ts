@@ -3,11 +3,10 @@ export type LiteralLayout<T> = {
   construct: (
     /**
      * Start location, where z is at the leading edge of the area
-     * (heading in negative direction), y is at the bottom of the
-     * (ascending) and x is in the middle.
+     * (heading in negative direction) and x is in the middle.
      */
-    start: [x: number, y: number, z: number],
-    size: [x: number, y: number, z: number],
+    start: [x: number, z: number],
+    size: [x: number, z: number],
   ) => T;
 };
 
@@ -31,12 +30,12 @@ export const converted = <Input, Output>(
 
 export type FixedLayout<T> = {
   type: "fixed-layout";
-  size: [x: number | undefined, y: number | undefined, z: number | undefined];
+  size: [x: number | undefined, z: number | undefined];
   contents: Layout<T>;
 };
 
 export const fixed = <T>(
-  size: [x: number | undefined, y: number | undefined, z: number | undefined],
+  size: [x: number | undefined, z: number | undefined],
   contents: Layout<T>,
 ): FixedLayout<T> => ({ type: "fixed-layout", size, contents });
 

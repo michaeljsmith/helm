@@ -10,19 +10,15 @@ export const applyLayout = <T>(layout: Layout<T>): Iterable<T> => {
   const desiredSize = getDesiredSizeForLayout(layout);
   return constructLayout(
     layout,
-    [0, 0, 0],
-    [
-      checkExists(desiredSize[0].min),
-      checkExists(desiredSize[1].min),
-      checkExists(desiredSize[2].min),
-    ],
+    [0, 0],
+    [checkExists(desiredSize[0].min), checkExists(desiredSize[1].min)],
   );
 };
 
 const constructLayout = function* <T>(
   layout: Layout<T>,
-  start: [x: number, y: number, z: number],
-  dimensions: [x: number, y: number, z: number],
+  start: [x: number, z: number],
+  dimensions: [x: number, z: number],
 ): Generator<T> {
   switch (layout.type) {
     case "literal-layout": {
@@ -44,29 +40,22 @@ const constructLayout = function* <T>(
     case "series-layout": {
       let minimumTotalDepth: number = 0;
       for (const child of layout.children) {
-        const [_childWidth, _childHeight, childDepth] =
-          getDesiredSizeForLayout(child);
+        const [_childWidth, childDepth] = getDesiredSizeForLayout(child);
 
         minimumTotalDepth += childDepth.min ?? 0;
       }
 
-      const [x, y] = start;
-      let [, , z] = start;
-      const [assignedWidth, assignedHeight, assignedDepth] = dimensions;
+      const [x] = start;
+      let [, z] = start;
+      const [assignedWidth, assignedDepth] = dimensions;
       let excessDepth = assignedDepth - minimumTotalDepth;
 
       for (const child of layout.children) {
-        const [childWidthRange, childHeightRange, childDepthRange] =
+        const [childWidthRange, childDepthRange] =
           getDesiredSizeForLayout(child);
 
         const childWidth = clampToRangeNatural(childWidthRange, assignedWidth);
         checkThat(assignedWidth >= childWidth);
-
-        const childHeight = clampToRangeNatural(
-          childHeightRange,
-          assignedHeight,
-        );
-        checkThat(assignedHeight >= childHeight);
 
         const minChildDepth = childDepthRange.min ?? 0;
         const childDepth = clampToRangeNatural(
@@ -75,11 +64,7 @@ const constructLayout = function* <T>(
         );
         excessDepth -= childDepth - minChildDepth;
 
-        yield* constructLayout(
-          child,
-          [x, y, z],
-          [childWidth, childHeight, childDepth],
-        );
+        yield* constructLayout(child, [x, z], [childWidth, childDepth]);
         z -= childDepth; // The -z direction is forward.
       }
     }
@@ -88,10 +73,10 @@ const constructLayout = function* <T>(
 
 const getDesiredSizeForLayout = (
   layout: Layout<unknown>,
-): [x: Range<number>, y: Range<number>, z: Range<number>] => {
+): [x: Range<number>, z: Range<number>] => {
   switch (layout.type) {
     case "literal-layout": {
-      return [{}, {}, {}];
+      return [{}, {}];
     }
 
     case "converted-layout": {
@@ -99,9 +84,7 @@ const getDesiredSizeForLayout = (
     }
 
     case "fixed-layout": {
-      const [contentX, contentY, contentZ] = getDesiredSizeForLayout(
-        layout.contents,
-      );
+      const [contentX, contentZ] = getDesiredSizeForLayout(layout.contents);
       return [
         intersectionOfRangesNatural(
           { min: layout.size[0], max: layout.size[0] },
@@ -109,10 +92,6 @@ const getDesiredSizeForLayout = (
         ),
         intersectionOfRangesNatural(
           { min: layout.size[1], max: layout.size[1] },
-          contentY,
-        ),
-        intersectionOfRangesNatural(
-          { min: layout.size[2], max: layout.size[2] },
           contentZ,
         ),
       ];
@@ -120,12 +99,10 @@ const getDesiredSizeForLayout = (
 
     case "series-layout": {
       let width: Range<number> = {};
-      let height: Range<number> = {};
       let totalDepth: Range<number> = { min: 0, max: 0 };
 
       for (const child of layout.children) {
-        const [childWidth, childHeight, childDepth] =
-          getDesiredSizeForLayout(child);
+        const [childWidth, childDepth] = getDesiredSizeForLayout(child);
 
         // If the children have a max dimension, ignore it - the container will
         // be as wide as it needs to be, and will create the child with the right
@@ -134,15 +111,11 @@ const getDesiredSizeForLayout = (
           ...childWidth,
           max: undefined,
         });
-        height = intersectionOfRangesNatural(height, {
-          ...childHeight,
-          max: undefined,
-        });
 
         totalDepth = sumOfRangesNatural(totalDepth, childDepth);
       }
 
-      return [width, height, totalDepth];
+      return [width, totalDepth];
     }
   }
 };

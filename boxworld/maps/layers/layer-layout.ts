@@ -8,8 +8,8 @@ export const layer = (
 ): LiteralLayout<TerrainLayer> => ({
   type: "literal-layout",
   construct: (start, size) => {
-    const [width, _height, depth] = size;
-    const [startX, _startY, startZ] = start;
+    const [width, depth] = size;
+    const [startX, startZ] = start;
     const layerSize: [number, number] = [width, depth];
     const left = startX - (width >> 1);
     const far = startZ - depth;
