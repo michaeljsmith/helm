@@ -6,7 +6,7 @@ describe("chunksForTerrain", () => {
   it("handles empty terrain", () => {
     const chunks = [
       ...chunksForTerrain({
-        origin: point2With(1, 2),
+        center: point2With(1, 2),
         dimensions: aabDimensions2With(0, 0),
       }),
     ];
@@ -16,30 +16,30 @@ describe("chunksForTerrain", () => {
   it("handles single chunk", () => {
     const chunks = [
       ...chunksForTerrain({
-        origin: point2With(1, 2),
+        center: point2With(1, 2),
         dimensions: aabDimensions2With(1, 1),
       }),
     ];
     expect(chunks).toEqual([
-      { origin: point2With(1, 2), dimensions: aabDimensions2With(1, 1) },
+      { center: point2With(1, 2), dimensions: aabDimensions2With(1, 1) },
     ]);
   });
 
   it("handles two chunks horizontally", () => {
     const chunks = [
       ...chunksForTerrain({
-        origin: point2With(1, 2),
-        dimensions: aabDimensions2With(CHUNK_SIZE_CELLS + 1, 1),
+        center: point2With(1, 2),
+        dimensions: aabDimensions2With((CHUNK_SIZE_CELLS + 1) / 2, 1),
       }),
     ];
     expect(chunks).toEqual([
       {
-        origin: point2With(1, 2),
-        dimensions: aabDimensions2With(CHUNK_SIZE_CELLS, 1),
+        center: point2With(0.5, 2),
+        dimensions: aabDimensions2With(CHUNK_SIZE_CELLS / 2, 1),
       },
       {
-        origin: point2With(CHUNK_SIZE_CELLS + 1, 2),
-        dimensions: aabDimensions2With(1, 1),
+        center: point2With(CHUNK_SIZE_CELLS / 2 + 1, 2),
+        dimensions: aabDimensions2With(0.5, 1),
       },
     ]);
   });
@@ -47,18 +47,18 @@ describe("chunksForTerrain", () => {
   it("handles two chunks vertically", () => {
     const chunks = [
       ...chunksForTerrain({
-        origin: point2With(1, 2),
-        dimensions: aabDimensions2With(1, CHUNK_SIZE_CELLS + 1),
+        center: point2With(1, 2),
+        dimensions: aabDimensions2With(1, (CHUNK_SIZE_CELLS + 1) / 2),
       }),
     ];
     expect(chunks).toEqual([
       {
-        origin: point2With(1, 2),
-        dimensions: aabDimensions2With(1, CHUNK_SIZE_CELLS),
+        center: point2With(1, 1.5),
+        dimensions: aabDimensions2With(1, CHUNK_SIZE_CELLS / 2),
       },
       {
-        origin: point2With(1, CHUNK_SIZE_CELLS + 2),
-        dimensions: aabDimensions2With(1, 1),
+        center: point2With(1, CHUNK_SIZE_CELLS / 2 + 2),
+        dimensions: aabDimensions2With(1, 0.5),
       },
     ]);
   });
@@ -66,14 +66,20 @@ describe("chunksForTerrain", () => {
   it("handles max size chunks", () => {
     const chunks = [
       ...chunksForTerrain({
-        origin: point2With(1, 2),
-        dimensions: aabDimensions2With(CHUNK_SIZE_CELLS, CHUNK_SIZE_CELLS),
+        center: point2With(1, 2),
+        dimensions: aabDimensions2With(
+          CHUNK_SIZE_CELLS / 2,
+          CHUNK_SIZE_CELLS / 2,
+        ),
       }),
     ];
     expect(chunks).toEqual([
       {
-        origin: point2With(1, 2),
-        dimensions: aabDimensions2With(CHUNK_SIZE_CELLS, CHUNK_SIZE_CELLS),
+        center: point2With(1, 2),
+        dimensions: aabDimensions2With(
+          CHUNK_SIZE_CELLS / 2,
+          CHUNK_SIZE_CELLS / 2,
+        ),
       },
     ]);
   });

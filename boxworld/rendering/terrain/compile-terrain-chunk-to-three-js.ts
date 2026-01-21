@@ -4,7 +4,7 @@ import {
   Material,
   MeshPhongMaterial,
 } from "three";
-import { TerrainBounds } from "../../maps/terrain/terrain-bounds.js";
+import { Aab2 } from "../../../math/aab.js";
 import { Terrain } from "../../maps/terrain/terrain.js";
 import { compileTerrainChunk } from "./compile-terrain-chunk.js";
 
@@ -12,7 +12,7 @@ const material = new MeshPhongMaterial({ color: 0x00ff00 });
 
 export const compileTerrainChunkToThreeJs = (
   terrain: Terrain,
-  bounds: TerrainBounds,
+  bounds: Aab2,
 ): { geometry: BufferGeometry; material: Material } => {
   const results = compileTerrainChunk(terrain, bounds);
 

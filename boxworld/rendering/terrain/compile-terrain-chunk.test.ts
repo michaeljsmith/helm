@@ -10,8 +10,8 @@ describe("compileTerrainChunk", () => {
     const layer = layerLayout.construct([1, 2], [1, 1]);
     const terrain = terrainFromLayers([layer]);
     const chunk = compileTerrainChunk(terrain, {
-      origin: point2With(1, 1),
-      dimensions: aabDimensions2With(1, 1),
+      center: point2With(1.5, 1.5),
+      dimensions: aabDimensions2With(0.5, 0.5),
     });
     expect(chunk).toMatchSnapshot();
   });
@@ -21,8 +21,8 @@ describe("compileTerrainChunk", () => {
     const layer = layerLayout.construct([1, 0], [2, 2]);
     const terrain = terrainFromLayers([layer]);
     const chunk = compileTerrainChunk(terrain, {
-      origin: point2With(0, -2),
-      dimensions: aabDimensions2With(2, 2),
+      center: point2With(1, -1),
+      dimensions: aabDimensions2With(1, 1),
     });
     expect(chunk).toMatchSnapshot();
   });

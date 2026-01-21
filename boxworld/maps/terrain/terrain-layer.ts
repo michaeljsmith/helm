@@ -1,7 +1,7 @@
-import { TerrainBounds } from "./terrain-bounds.js";
+import { Aab2 } from "../../../math/aab.js";
 import { TerrainHeight } from "./terrain-height.js";
 
 export type TerrainLayer = {
-  bounds: TerrainBounds;
+  bounds: Aab2;
   heightAt: (x: number, z: number) => TerrainHeight;
 };

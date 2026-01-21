@@ -10,8 +10,8 @@ describe("terrainFromLayers", () => {
     const layerLayout = newLayer(({ position: [x, y] }) => 10 * x + y);
     const layer = layerLayout.construct([1, 2], [1, 1]);
     const terrain = terrainFromLayers([layer]);
-    expect(terrain.bounds.origin).toEqual(point2With(1, 1));
-    expect(terrain.bounds.dimensions).toEqual(aabDimensions2With(1, 1));
+    expect(terrain.bounds.center).toEqual(point2With(1.5, 1.5));
+    expect(terrain.bounds.dimensions).toEqual(aabDimensions2With(0.5, 0.5));
     const height = terrainCellAt(terrain, 1, 1);
     expect(height.corners).toEqual([
       [11, 21],
@@ -23,8 +23,8 @@ describe("terrainFromLayers", () => {
     const layerLayout = newLayer(({ position: [x, y] }) => 10 * x + y);
     const layer = layerLayout.construct([1, 2], [2, 2]);
     const terrain = terrainFromLayers([layer]);
-    expect(terrain.bounds.origin).toEqual(point2With(0, 0));
-    expect(terrain.bounds.dimensions).toEqual(aabDimensions2With(2, 2));
+    expect(terrain.bounds.center).toEqual(point2With(1, 1));
+    expect(terrain.bounds.dimensions).toEqual(aabDimensions2With(1, 1));
     expect(terrainCellAt(terrain, 0, 0).corners).toEqual([
       [0, 10],
       [1, 11],
@@ -49,8 +49,8 @@ describe("terrainFromLayers", () => {
     const layerLayout2 = newLayer(({ position: [x, y] }) => 10 * x + y);
     const layer2 = layerLayout2.construct([1, 4], [1, 1]);
     const terrain = terrainFromLayers([layer1, layer2]);
-    expect(terrain.bounds.origin).toEqual(point2With(1, 1));
-    expect(terrain.bounds.dimensions).toEqual(aabDimensions2With(1, 3));
+    expect(terrain.bounds.center).toEqual(point2With(1.5, 2.5));
+    expect(terrain.bounds.dimensions).toEqual(aabDimensions2With(0.5, 1.5));
     const height = terrainCellAt(terrain, 1, 1);
     expect(height.corners).toEqual([
       [11, 21],

@@ -7,8 +7,8 @@ describe("terrainCellAt", () => {
   it("looks up cells", () => {
     const terrain: Terrain = {
       bounds: {
-        origin: point2With(1, 3),
-        dimensions: aabDimensions2With(2, 2),
+        center: point2With(2, 4),
+        dimensions: aabDimensions2With(1, 1),
       },
       cells: [
         {
@@ -58,8 +58,8 @@ describe("terrainCellAt", () => {
   it("catches out-of-bounds lookup", () => {
     const terrain: Terrain = {
       bounds: {
-        origin: point2With(1, 3),
-        dimensions: aabDimensions2With(1, 1),
+        center: point2With(1.5, 3.5),
+        dimensions: aabDimensions2With(0.5, 0.5),
       },
       cells: [
         {

@@ -160,9 +160,9 @@ const newTerrainChunkGeometryAccessor = (): ((
       geometryCache.set(terrainChunk.terrain, chunkGeometriesForTerrain);
     }
 
-    const [left, far] = terrainChunk.bounds.origin;
+    const [x, y] = terrainChunk.bounds.center;
     const [width, depth] = terrainChunk.bounds.dimensions;
-    const chunkKey = `${left},${far}:${width},${depth}`;
+    const chunkKey = `${x},${y}:${width},${depth}`;
     let chunkGeometry = chunkGeometriesForTerrain.get(chunkKey);
     if (chunkGeometry === undefined) {
       chunkGeometry = compileTerrainChunkToThreeJs(
