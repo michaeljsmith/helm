@@ -1,9 +1,13 @@
+import {
+  AabDimensions2,
+  aabDimensions2With,
+} from "../../../math/aab-dimensions.js";
+import { Point2, point2With } from "../../../math/point.js";
 import { checkThat } from "../../../utils/preconditions/check-that.js";
 import { converted, Layout } from "../layouts/layout.js";
-import { TerrainDimensions } from "./terrain-dimensions.js";
-import { TERRAIN_HOLE, TerrainHeight } from "./terrain-height.js";
+import { TerrainCell } from "./terrain-cell.js";
+import { TERRAIN_HOLE } from "./terrain-height.js";
 import { TerrainLayer } from "./terrain-layer.js";
-import { TerrainPosition } from "./terrain-position.js";
 import { Terrain } from "./terrain.js";
 
 export const terrain = (layers: Layout<TerrainLayer>) =>
@@ -20,10 +24,15 @@ export const terrainFromLayers = (layers: TerrainLayer[]): Terrain => {
   const near = far + dimensions[1];
 
   // Clear the terrain.
-  const heights: TerrainHeight[] = [];
+  const cells: TerrainCell[] = [];
   for (let x = left; x < right; ++x) {
     for (let z = far; z < near; ++z) {
-      heights[(z - far) * dimensions[0] + (x - left)] = TERRAIN_HOLE;
+      cells[(z - far) * dimensions[0] + (x - left)] = {
+        corners: [
+          [TERRAIN_HOLE, TERRAIN_HOLE],
+          [TERRAIN_HOLE, TERRAIN_HOLE],
+        ],
+      };
     }
   }
 
@@ -35,29 +44,34 @@ export const terrainFromLayers = (layers: TerrainLayer[]): Terrain => {
     for (let x = layerLeft; x < layerRight; ++x) {
       for (let z = layerFar; z < layerNear; ++z) {
         const index = (z - far) * dimensions[0] + (x - left);
-        const existingHeight = heights[index];
-        const layerHeight = layer.heightAt(x, z);
-        heights[index] =
-          // If The layer has a hole here, set a hole.
-          layerHeight === TERRAIN_HOLE
-            ? TERRAIN_HOLE
-            : // Else if there is currently a hole here, prefer the new value.
-              existingHeight === TERRAIN_HOLE
-              ? layerHeight
-              : // Else sum the heights.
-                existingHeight + layerHeight;
+        const cell = cells[index];
+        for (let cornerX = 0; cornerX < 2; ++cornerX) {
+          for (let cornerZ = 0; cornerZ < 2; ++cornerZ) {
+            const existingHeight = cell.corners[cornerZ][cornerX];
+            const layerHeight = layer.heightAt(x + cornerX, z + cornerZ);
+            cell.corners[cornerZ][cornerX] =
+              // If The layer has a hole here, set a hole.
+              layerHeight === TERRAIN_HOLE
+                ? TERRAIN_HOLE
+                : // Else if there is currently a hole here, prefer the new value.
+                  existingHeight === TERRAIN_HOLE
+                  ? layerHeight
+                  : // Else sum the heights.
+                    existingHeight + layerHeight;
+          }
+        }
       }
     }
   }
 
-  return { bounds: { origin, dimensions }, heights };
+  return { bounds: { origin, dimensions }, cells };
 };
 
 const boundariesOfLayers = (
   layers: TerrainLayer[],
 ): {
-  origin: TerrainPosition;
-  dimensions: TerrainDimensions;
+  origin: Point2;
+  dimensions: AabDimensions2;
 } => {
   checkThat(layers.length > 0);
   const left = Math.min(...layers.map((layer) => layer.origin[0]));
@@ -69,7 +83,7 @@ const boundariesOfLayers = (
     ...layers.map((layer) => layer.origin[1] + layer.dimensions[1]),
   );
   return {
-    origin: [left, far],
-    dimensions: [right - left, near - far],
+    origin: point2With(left, far),
+    dimensions: aabDimensions2With(right - left, near - far),
   };
 };

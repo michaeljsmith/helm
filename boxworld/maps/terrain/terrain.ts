@@ -1,7 +1,7 @@
 import { TerrainBounds } from "./terrain-bounds.js";
-import { TerrainHeight } from "./terrain-height.js";
+import { TerrainCell } from "./terrain-cell.js";
 
 export type Terrain = {
   bounds: TerrainBounds;
-  heights: TerrainHeight[];
+  cells: TerrainCell[];
 };

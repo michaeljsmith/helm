@@ -1,3 +1,5 @@
+import { aabDimensions2With } from "../../../math/aab-dimensions.js";
+import { point2With } from "../../../math/point.js";
 import { TerrainBounds } from "./terrain-bounds.js";
 
 export const CHUNK_SIZE_CELLS = 16;
@@ -21,8 +23,8 @@ export const chunksForTerrain = function* (
       const chunkWidth = Math.min(CHUNK_SIZE_CELLS, width - (chunkLeft - left));
       const chunkDepth = Math.min(CHUNK_SIZE_CELLS, depth - (chunkFar - far));
       yield {
-        origin: [chunkLeft, chunkFar],
-        dimensions: [chunkWidth, chunkDepth],
+        origin: point2With(chunkLeft, chunkFar),
+        dimensions: aabDimensions2With(chunkWidth, chunkDepth),
       };
     }
   }

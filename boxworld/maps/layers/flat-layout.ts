@@ -4,4 +4,4 @@ import { TerrainLayer } from "../terrain/terrain-layer.js";
 import { layer } from "./layer-layout.js";
 
 export const flat = (height: TerrainHeight): LiteralLayout<TerrainLayer> =>
-  layer((_x, _z) => height);
+  layer((_args) => height);

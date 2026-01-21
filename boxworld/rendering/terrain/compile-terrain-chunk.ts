@@ -21,15 +21,23 @@ export const compileTerrainChunk = (
   const near = far + depth;
   for (let z = far; z < near; ++z) {
     for (let x = left; x < right; ++x) {
-      const height = terrainCellAt(terrain, x, z);
-      if (height === TERRAIN_HOLE) {
+      const cell = terrainCellAt(terrain, x, z);
+
+      if (
+        cell.corners[0][0] === TERRAIN_HOLE ||
+        cell.corners[0][1] === TERRAIN_HOLE ||
+        cell.corners[1][0] === TERRAIN_HOLE ||
+        cell.corners[1][1] === TERRAIN_HOLE
+      ) {
         continue;
       }
+      const corners = cell.corners as [[number, number], [number, number]];
 
       const i0 = positions.length / 3;
       for (let corner = 0; corner < 4; ++corner) {
         const sideX = (corner & 2) >> 1;
         const sideZ = ((corner + 1) & 2) >> 1;
+        const height = corners[sideZ][sideX];
         positions.push(
           (x + sideX) * cellSize,
           height * cellSize,

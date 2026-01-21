@@ -1,7 +1,16 @@
 import { checkExists } from "../utils/preconditions/check-exists.js";
-import { Vector3 } from "./vector.js";
+import { Vector2, Vector3 } from "./vector.js";
 
 type AabbDimensionsBrand = { __IS_AAB_DIMENSIONS__: true };
+
+export type AabDimensions2 = Vector2 & AabbDimensionsBrand;
+export const aabDimensions2With = (
+  width: number,
+  height: number,
+): AabDimensions2 => {
+  return new Float64Array([width, height]) as AabDimensions2;
+};
+
 export type AabDimensions = Vector3 & AabbDimensionsBrand;
 export const aabDimensionsWith = (
   width: number,

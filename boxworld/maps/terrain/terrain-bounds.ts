@@ -1,7 +1,7 @@
-import { TerrainDimensions } from "./terrain-dimensions.js";
-import { TerrainPosition } from "./terrain-position.js";
+import { AabDimensions2 } from "../../../math/aab-dimensions.js";
+import { Point2 } from "../../../math/point.js";
 
 export type TerrainBounds = {
-  origin: TerrainPosition;
-  dimensions: TerrainDimensions;
+  origin: Point2;
+  dimensions: AabDimensions2;
 };

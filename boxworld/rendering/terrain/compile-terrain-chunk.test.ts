@@ -1,26 +1,28 @@
+import { aabDimensions2With } from "../../../math/aab-dimensions.js";
+import { point2With } from "../../../math/point.js";
 import { layer as newLayer } from "../../maps/layers/layer-layout.js";
 import { terrainFromLayers } from "../../maps/terrain/terrain-from-layers.js";
 import { compileTerrainChunk } from "./compile-terrain-chunk.js";
 
 describe("compileTerrainChunk", () => {
   it("compiles terrain chunk with single cell", () => {
-    const layerLayout = newLayer((_x, _y) => 1);
+    const layerLayout = newLayer((_args) => 1);
     const layer = layerLayout.construct([1, 2], [1, 1]);
     const terrain = terrainFromLayers([layer]);
     const chunk = compileTerrainChunk(terrain, {
-      origin: [1, 1],
-      dimensions: [1, 1],
+      origin: point2With(1, 1),
+      dimensions: aabDimensions2With(1, 1),
     });
     expect(chunk).toMatchSnapshot();
   });
 
   it("compiles terrain chunk with multiple cells", () => {
-    const layerLayout = newLayer((x, y) => x + y);
+    const layerLayout = newLayer(({ position: [x, y] }) => x + y);
     const layer = layerLayout.construct([1, 0], [2, 2]);
     const terrain = terrainFromLayers([layer]);
     const chunk = compileTerrainChunk(terrain, {
-      origin: [0, -2],
-      dimensions: [2, 2],
+      origin: point2With(0, -2),
+      dimensions: aabDimensions2With(2, 2),
     });
     expect(chunk).toMatchSnapshot();
   });
