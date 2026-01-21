@@ -38,9 +38,9 @@ export const terrainFromLayers = (layers: TerrainLayer[]): Terrain => {
 
   // Render each layer into the terrain.
   for (const layer of layers) {
-    const [layerLeft, layerFar] = layer.origin;
-    const layerRight = layerLeft + layer.dimensions[0];
-    const layerNear = layerFar + layer.dimensions[1];
+    const [layerLeft, layerFar] = layer.bounds.origin;
+    const layerRight = layerLeft + layer.bounds.dimensions[0];
+    const layerNear = layerFar + layer.bounds.dimensions[1];
     for (let x = layerLeft; x < layerRight; ++x) {
       for (let z = layerFar; z < layerNear; ++z) {
         const index = (z - far) * dimensions[0] + (x - left);
@@ -74,13 +74,17 @@ const boundariesOfLayers = (
   dimensions: AabDimensions2;
 } => {
   checkThat(layers.length > 0);
-  const left = Math.min(...layers.map((layer) => layer.origin[0]));
-  const far = Math.min(...layers.map((layer) => layer.origin[1]));
+  const left = Math.min(...layers.map((layer) => layer.bounds.origin[0]));
+  const far = Math.min(...layers.map((layer) => layer.bounds.origin[1]));
   const right = Math.max(
-    ...layers.map((layer) => layer.origin[0] + layer.dimensions[0]),
+    ...layers.map(
+      (layer) => layer.bounds.origin[0] + layer.bounds.dimensions[0],
+    ),
   );
   const near = Math.max(
-    ...layers.map((layer) => layer.origin[1] + layer.dimensions[1]),
+    ...layers.map(
+      (layer) => layer.bounds.origin[1] + layer.bounds.dimensions[1],
+    ),
   );
   return {
     origin: point2With(left, far),

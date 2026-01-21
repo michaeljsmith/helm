@@ -24,8 +24,7 @@ export const layer = (
     const far = startZ - depth;
     const origin = point2With(left, far);
     const layer: TerrainLayer = {
-      origin,
-      dimensions,
+      bounds: { origin, dimensions },
       heightAt: (x, z) => {
         checkThat(x >= left);
         checkThat(x <= left + width);
