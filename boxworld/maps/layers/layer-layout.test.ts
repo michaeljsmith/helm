@@ -4,7 +4,11 @@ import { layer as newLayer } from "./layer-layout.js";
 
 describe("layerLayout", () => {
   it("creates layer with size 1", () => {
-    const layerLayout = newLayer(({ position: [x, y] }) => 10 * x + y);
+    const layerLayout = newLayer(
+      () =>
+        ([x, y]) =>
+          10 * x + y,
+    );
     const layer = layerLayout.construct([1, 2], [1, 1]);
     expect(layer.bounds.center).toEqual(point2With(1.5, 1.5));
     expect(layer.bounds.dimensions).toEqual(aabDimensions2With(0.5, 0.5));
@@ -13,7 +17,11 @@ describe("layerLayout", () => {
   });
 
   it("creates layer with larger size", () => {
-    const layerLayout = newLayer(({ position: [x, y] }) => 10 * x + y);
+    const layerLayout = newLayer(
+      () =>
+        ([x, y]) =>
+          10 * x + y,
+    );
     const layer = layerLayout.construct([1, 2], [2, 2]);
     expect(layer.bounds.center).toEqual(point2With(1, 1));
     expect(layer.bounds.dimensions).toEqual(aabDimensions2With(1, 1));
@@ -24,7 +32,11 @@ describe("layerLayout", () => {
   });
 
   it("catches out-of-bounds lookup", () => {
-    const layerLayout = newLayer(({ position: [x, y] }) => 10 * x + y);
+    const layerLayout = newLayer(
+      () =>
+        ([x, y]) =>
+          10 * x + y,
+    );
     const layer = layerLayout.construct([1, 2], [1, 1]);
     expect(layer.bounds.center).toEqual(point2With(1.5, 1.5));
     expect(layer.bounds.dimensions).toEqual(aabDimensions2With(0.5, 0.5));

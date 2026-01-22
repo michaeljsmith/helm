@@ -7,7 +7,7 @@ import { TerrainHeight } from "../terrain/terrain-height.js";
 import { TerrainLayer } from "../terrain/terrain-layer.js";
 
 export const layer = (
-  heightAt: (args: { position: Point2; bounds: Aab2 }) => TerrainHeight,
+  heightAtForBounds: (bounds: Aab2) => (position: Point2) => TerrainHeight,
 ): LiteralLayout<TerrainLayer> => ({
   type: "literal-layout",
   construct: (start, size) => {
@@ -18,6 +18,7 @@ export const layer = (
     const far = startZ - depth;
     const center = point2With(left + width / 2, far + depth / 2);
     const bounds: Aab2 = { center, dimensions };
+    const heightAt = heightAtForBounds(bounds);
     const layer: TerrainLayer = {
       bounds,
       heightAt: (x, z) => {
@@ -25,7 +26,7 @@ export const layer = (
         checkThat(x <= left + width);
         checkThat(z >= far);
         checkThat(z <= far + depth);
-        return heightAt({ position: point2With(x, z), bounds });
+        return heightAt(point2With(x, z));
       },
     };
     return layer;

@@ -7,7 +7,11 @@ import { TERRAIN_HOLE } from "./terrain-height.js";
 
 describe("terrainFromLayers", () => {
   it("constructs terrain from single layer with size 1", () => {
-    const layerLayout = newLayer(({ position: [x, y] }) => 10 * x + y);
+    const layerLayout = newLayer(
+      () =>
+        ([x, y]) =>
+          10 * x + y,
+    );
     const layer = layerLayout.construct([1, 2], [1, 1]);
     const terrain = terrainFromLayers([layer]);
     expect(terrain.bounds.center).toEqual(point2With(1.5, 1.5));
@@ -20,7 +24,11 @@ describe("terrainFromLayers", () => {
   });
 
   it("constructs terrain from single layer with larger size", () => {
-    const layerLayout = newLayer(({ position: [x, y] }) => 10 * x + y);
+    const layerLayout = newLayer(
+      () =>
+        ([x, y]) =>
+          10 * x + y,
+    );
     const layer = layerLayout.construct([1, 2], [2, 2]);
     const terrain = terrainFromLayers([layer]);
     expect(terrain.bounds.center).toEqual(point2With(1, 1));
@@ -44,9 +52,17 @@ describe("terrainFromLayers", () => {
   });
 
   it("constructs terrain from multiple layers", () => {
-    const layerLayout1 = newLayer(({ position: [x, y] }) => 10 * x + y);
+    const layerLayout1 = newLayer(
+      () =>
+        ([x, y]) =>
+          10 * x + y,
+    );
     const layer1 = layerLayout1.construct([1, 2], [1, 1]);
-    const layerLayout2 = newLayer(({ position: [x, y] }) => 10 * x + y);
+    const layerLayout2 = newLayer(
+      () =>
+        ([x, y]) =>
+          10 * x + y,
+    );
     const layer2 = layerLayout2.construct([1, 4], [1, 1]);
     const terrain = terrainFromLayers([layer1, layer2]);
     expect(terrain.bounds.center).toEqual(point2With(1.5, 2.5));
@@ -59,9 +75,9 @@ describe("terrainFromLayers", () => {
   });
 
   it("sums multiple layers", () => {
-    const layerLayout1 = newLayer((_args) => 1);
+    const layerLayout1 = newLayer(() => (_position) => 1);
     const layer1 = layerLayout1.construct([1, 2], [1, 1]);
-    const layerLayout2 = newLayer((_args) => 2);
+    const layerLayout2 = newLayer(() => (_position) => 2);
     const layer2 = layerLayout2.construct([1, 2], [1, 1]);
     const terrain = terrainFromLayers([layer1, layer2]);
     const height = terrainCellAt(terrain, 1, 1);
@@ -72,9 +88,9 @@ describe("terrainFromLayers", () => {
   });
 
   it("overwrites hole", () => {
-    const layerLayout1 = newLayer((_args) => TERRAIN_HOLE);
+    const layerLayout1 = newLayer(() => (_position) => TERRAIN_HOLE);
     const layer1 = layerLayout1.construct([1, 2], [1, 1]);
-    const layerLayout2 = newLayer((_args) => 2);
+    const layerLayout2 = newLayer(() => (_position) => 2);
     const layer2 = layerLayout2.construct([1, 2], [1, 1]);
     const terrain = terrainFromLayers([layer1, layer2]);
     const height = terrainCellAt(terrain, 1, 1);
@@ -85,9 +101,9 @@ describe("terrainFromLayers", () => {
   });
 
   it("overwrites hole", () => {
-    const layerLayout1 = newLayer((_args) => 1);
+    const layerLayout1 = newLayer(() => (_position) => 1);
     const layer1 = layerLayout1.construct([1, 2], [1, 1]);
-    const layerLayout2 = newLayer((_args) => TERRAIN_HOLE);
+    const layerLayout2 = newLayer(() => (_position) => TERRAIN_HOLE);
     const layer2 = layerLayout2.construct([1, 2], [1, 1]);
     const terrain = terrainFromLayers([layer1, layer2]);
     const height = terrainCellAt(terrain, 1, 1);

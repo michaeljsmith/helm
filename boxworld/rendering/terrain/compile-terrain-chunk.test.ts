@@ -6,7 +6,7 @@ import { compileTerrainChunk } from "./compile-terrain-chunk.js";
 
 describe("compileTerrainChunk", () => {
   it("compiles terrain chunk with single cell", () => {
-    const layerLayout = newLayer((_args) => 1);
+    const layerLayout = newLayer(() => (_position) => 1);
     const layer = layerLayout.construct([1, 2], [1, 1]);
     const terrain = terrainFromLayers([layer]);
     const chunk = compileTerrainChunk(terrain, {
@@ -17,7 +17,11 @@ describe("compileTerrainChunk", () => {
   });
 
   it("compiles terrain chunk with multiple cells", () => {
-    const layerLayout = newLayer(({ position: [x, y] }) => x + y);
+    const layerLayout = newLayer(
+      () =>
+        ([x, y]) =>
+          x + y,
+    );
     const layer = layerLayout.construct([1, 0], [2, 2]);
     const terrain = terrainFromLayers([layer]);
     const chunk = compileTerrainChunk(terrain, {
