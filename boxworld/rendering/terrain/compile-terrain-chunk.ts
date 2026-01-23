@@ -1,4 +1,9 @@
 import { Aab2 } from "../../../math/aab.js";
+import { crossProduct } from "../../../math/cross-product.js";
+import { Direction } from "../../../math/direction.js";
+import { normalize } from "../../../math/normalize.js";
+import { Point, pointWith } from "../../../math/point.js";
+import { vectorDifference } from "../../../math/vector-difference.js";
 import { terrainCellAt } from "../../maps/terrain/terrain-cell-at.js";
 import { TERRAIN_HOLE } from "../../maps/terrain/terrain-height.js";
 import { Terrain } from "../../maps/terrain/terrain.js";
@@ -38,16 +43,29 @@ export const compileTerrainChunk = (
       const corners = cell.corners as [[number, number], [number, number]];
 
       const i0 = positions.length / 3;
-      for (let corner = 0; corner < 4; ++corner) {
+
+      const vertexPositionFor = (corner: number): Point => {
         const sideX = (corner & 2) >> 1;
         const sideZ = ((corner + 1) & 2) >> 1;
         const height = corners[sideZ][sideX];
-        positions.push(
+        return pointWith(
           (x + sideX) * CELL_SIZE,
           height * CELL_SIZE,
           (z + sideZ) * CELL_SIZE,
         );
-        normals.push(0, 1, 0);
+      };
+
+      const p1 = vertexPositionFor(1);
+      const p0 = vertexPositionFor(0);
+      const p3 = vertexPositionFor(3);
+      const forwardAlongPath = vectorDifference(p1, p0);
+      const rightAlongPath = vectorDifference(p3, p0);
+      const normal: Direction = normalize(
+        crossProduct(forwardAlongPath, rightAlongPath),
+      );
+      for (let corner = 0; corner < 4; ++corner) {
+        positions.push(...vertexPositionFor(corner));
+        normals.push(...normal);
         colors.push(0, 1, 0);
       }
 
