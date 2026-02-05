@@ -1,6 +1,7 @@
 import {
   AmbientLight,
   BufferGeometry,
+  Clock,
   DirectionalLight,
   Material,
   Mesh,
@@ -9,6 +10,8 @@ import {
   Scene,
   WebGLRenderer,
 } from "three";
+import { PhysicsBody } from "../physics/physics-body.js";
+import { updatePhysics } from "../physics/update-physics.js";
 import { ArtifactSet } from "./artifact-set.js";
 import { TerrainChunk } from "./maps/terrain/terrain-chunk.js";
 import { Terrain } from "./maps/terrain/terrain.js";
@@ -34,12 +37,17 @@ export const mount = <State>(
     1000,
   );
 
+  const clock = new Clock();
+
   const renderer = new WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setAnimationLoop(() => {
+    const dt = clock.getDelta();
+
     const artifacts = world(state);
     const modelInstances: ModelInstance[] = [];
     const terrainChunks: TerrainChunk[] = [];
+    const physicsBodies: PhysicsBody[] = [];
     for (const artfifact of artifacts.artifacts) {
       switch (artfifact.type) {
         case "model-instance-artifact":
@@ -54,11 +62,18 @@ export const mount = <State>(
           }
           break;
 
+        case "physics-body-artifact":
+          {
+            physicsBodies.push(artfifact.body);
+          }
+          break;
+
         default:
           throw ((x: never) => new Error("Unexpected " + x))(artfifact);
       }
     }
 
+    updatePhysics(dt, physicsBodies);
     sceneUpdater(modelInstances, terrainChunks);
 
     const cameraPosition = artifacts.camera.transform.position;

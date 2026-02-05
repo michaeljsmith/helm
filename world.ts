@@ -11,9 +11,10 @@ import { Terrain } from "./boxworld/maps/terrain/terrain.js";
 import { addModel } from "./boxworld/models/creation/add-model.js";
 import { newModel } from "./boxworld/models/creation/new-model.js";
 import { aabDimensionsWith } from "./math/aab-dimensions.js";
-import { pointWith } from "./math/point.js";
-import { IDENTITY_RIGID, rigidTransformWith } from "./math/rigid-transform.js";
+import { Point, pointWith } from "./math/point.js";
+import { rigidTransformWith } from "./math/rigid-transform.js";
 import { rotationAroundY } from "./math/rotation-around-axis.js";
+import { IDENTITY_UNIT_QUATERNION } from "./math/unit-quaternion.js";
 
 const terrains = [
   ...applyLayout(
@@ -40,16 +41,28 @@ const model = newModel((context) => {
   });
 });
 
-export const world = (): ArtifactSet => {
+type Creature = {
+  position: Point;
+};
+
+type WorldState = {
+  creatures: Creature[];
+};
+
+export const newWorld = (): WorldState => {
+  return {
+    creatures: [
+      {
+        position: pointWith(0, 2, -2),
+      },
+    ],
+  };
+};
+
+export const world = (state: WorldState): ArtifactSet => {
   const artifacts: Iterable<Artifact> = [
     ...artifactsForTerrain(terrains),
-    {
-      type: "model-instance-artifact",
-      instance: {
-        model,
-        transform: IDENTITY_RIGID,
-      },
-    },
+    ...artifactsForCreatures(state.creatures),
   ];
 
   const cameraRotation = rotationAroundY((-1 * Math.PI) / 4);
@@ -75,4 +88,39 @@ const artifactsForTerrain = function* (
       };
     }
   }
+};
+
+const artifactsForCreatures = function* (
+  creatures: Creature[],
+): Iterable<Artifact> {
+  for (const creature of creatures) {
+    yield* artifactForCreature(creature);
+  }
+};
+
+const artifactForCreature = function* (creature: Creature): Iterable<Artifact> {
+  yield {
+    type: "model-instance-artifact",
+    instance: {
+      model,
+      transform: rigidTransformWith(
+        IDENTITY_UNIT_QUATERNION,
+        creature.position,
+      ),
+    },
+  };
+
+  yield {
+    type: "physics-body-artifact",
+    body: {
+      dynamics: {
+        value: {
+          position: creature.position,
+        },
+        set: (newState) => {
+          creature.position = newState.position;
+        },
+      },
+    },
+  };
 };
