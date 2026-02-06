@@ -2,11 +2,11 @@ import { checkThat } from "../../../utils/preconditions/check-that.js";
 import { TerrainCell } from "./terrain-cell.js";
 import { Terrain } from "./terrain.js";
 
-export const terrainCellAt = (
+export function terrainCellAt(
   terrain: Terrain,
   x: number,
   z: number,
-): TerrainCell => {
+): TerrainCell {
   const center = terrain.bounds.center;
   const dimensions = terrain.bounds.dimensions;
   const left = center[0] - dimensions[0];
@@ -20,4 +20,4 @@ export const terrainCellAt = (
   const relativeX = x - left;
   const relativeZ = z - far;
   return terrain.cells[relativeZ * width + relativeX];
-};
+}

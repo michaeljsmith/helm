@@ -6,10 +6,12 @@ export type RigidTransform = {
   position: Point;
 };
 
-export const rigidTransformWith = (
+export function rigidTransformWith(
   rotation: UnitQuaternion,
   position: Point,
-): RigidTransform => ({ rotation, position });
+): RigidTransform {
+  return { rotation, position };
+}
 
 export const IDENTITY_RIGID = rigidTransformWith(
   IDENTITY_UNIT_QUATERNION,

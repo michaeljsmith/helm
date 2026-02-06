@@ -52,7 +52,7 @@ type WorldState = {
   creatures: Creature[];
 };
 
-export const newWorld = (): WorldState => {
+export function newWorld(): WorldState {
   return {
     creatures: [
       {
@@ -61,9 +61,9 @@ export const newWorld = (): WorldState => {
       },
     ],
   };
-};
+}
 
-export const world = (state: WorldState): ArtifactSet => {
+export function world(state: WorldState): ArtifactSet {
   const artifacts: Iterable<Artifact> = [
     ...artifactsForTerrain(terrains),
     ...artifactsForCreatures(state.creatures),
@@ -79,11 +79,9 @@ export const world = (state: WorldState): ArtifactSet => {
     camera,
     artifacts,
   };
-};
+}
 
-const artifactsForTerrain = function* (
-  terrains: Iterable<Terrain>,
-): Iterable<Artifact> {
+function* artifactsForTerrain(terrains: Iterable<Terrain>): Iterable<Artifact> {
   for (const terrain of terrains) {
     for (const chunkBounds of chunksForTerrain(terrain.bounds)) {
       yield {
@@ -92,17 +90,15 @@ const artifactsForTerrain = function* (
       };
     }
   }
-};
+}
 
-const artifactsForCreatures = function* (
-  creatures: Creature[],
-): Iterable<Artifact> {
+function* artifactsForCreatures(creatures: Creature[]): Iterable<Artifact> {
   for (const creature of creatures) {
     yield* artifactForCreature(creature);
   }
-};
+}
 
-const artifactForCreature = function* (creature: Creature): Iterable<Artifact> {
+function* artifactForCreature(creature: Creature): Iterable<Artifact> {
   yield {
     type: "model-instance-artifact",
     instance: {
@@ -128,4 +124,4 @@ const artifactForCreature = function* (creature: Creature): Iterable<Artifact> {
       },
     },
   };
-};
+}

@@ -6,16 +6,20 @@ export interface Range<T> {
   max?: T;
 }
 
-export const lowerBoundOf = <T>(range: Range<T>): LowerBound<T> =>
-  range.min === undefined ? NEGATIVE_INFINITY : range.min;
+export function lowerBoundOf<T>(range: Range<T>): LowerBound<T> {
+  return range.min === undefined ? NEGATIVE_INFINITY : range.min;
+}
 
-export const upperBoundOf = <T>(range: Range<T>): UpperBound<T> =>
-  range.max === undefined ? POSITIVE_INFINITY : range.max;
+export function upperBoundOf<T>(range: Range<T>): UpperBound<T> {
+  return range.max === undefined ? POSITIVE_INFINITY : range.max;
+}
 
-export const rangeFromBounds = <T>(
+export function rangeFromBounds<T>(
   lowerBound: LowerBound<T>,
   upperBound: UpperBound<T>,
-): Range<T> => ({
-  min: lowerBound === NEGATIVE_INFINITY ? undefined : lowerBound,
-  max: upperBound === POSITIVE_INFINITY ? undefined : upperBound,
-});
+): Range<T> {
+  return {
+    min: lowerBound === NEGATIVE_INFINITY ? undefined : lowerBound,
+    max: upperBound === POSITIVE_INFINITY ? undefined : upperBound,
+  };
+}

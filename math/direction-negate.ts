@@ -1,4 +1,5 @@
 import { Direction, directionWith } from "./direction.js";
 
-export const directionNegate = (direction: Direction): Direction =>
-  directionWith(-direction[0], -direction[1], -direction[2]);
+export function directionNegate(direction: Direction): Direction {
+  return directionWith(-direction[0], -direction[1], -direction[2]);
+}

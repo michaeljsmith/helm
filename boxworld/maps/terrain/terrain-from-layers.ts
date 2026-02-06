@@ -8,13 +8,14 @@ import { TERRAIN_HOLE } from "./terrain-height.js";
 import { TerrainLayer } from "./terrain-layer.js";
 import { Terrain } from "./terrain.js";
 
-export const terrain = (layers: Layout<TerrainLayer>) =>
-  converted<TerrainLayer, Terrain>(
+export function terrain(layers: Layout<TerrainLayer>) {
+  return converted<TerrainLayer, Terrain>(
     (layers) => terrainFromLayers([...layers]),
     layers,
   );
+}
 
-export const terrainFromLayers = (layers: TerrainLayer[]): Terrain => {
+export function terrainFromLayers(layers: TerrainLayer[]): Terrain {
   const { center, dimensions } = boundariesOfLayers(layers);
 
   const left = center[0] - dimensions[0];
@@ -67,9 +68,9 @@ export const terrainFromLayers = (layers: TerrainLayer[]): Terrain => {
   }
 
   return { bounds: { center, dimensions }, cells };
-};
+}
 
-const boundariesOfLayers = (layers: TerrainLayer[]): Aab2 => {
+function boundariesOfLayers(layers: TerrainLayer[]): Aab2 {
   checkThat(layers.length > 0);
   const left = Math.min(
     ...layers.map(
@@ -97,4 +98,4 @@ const boundariesOfLayers = (layers: TerrainLayer[]): Aab2 => {
     center: point2With(left + halfWidth, far + halfDepth),
     dimensions: aabDimensions2With(halfWidth, halfDepth),
   };
-};
+}

@@ -1,9 +1,9 @@
 import { UnitQuaternion, unitQuaternionWith } from "./unit-quaternion.js";
 
-export const quaternionMultiply = (
+export function quaternionMultiply(
   q1: UnitQuaternion,
   q2: UnitQuaternion,
-): UnitQuaternion => {
+): UnitQuaternion {
   const [w1, x1, y1, z1] = q1;
   const [w2, x2, y2, z2] = q2;
   return unitQuaternionWith(
@@ -12,4 +12,4 @@ export const quaternionMultiply = (
     w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
     w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
   );
-};
+}

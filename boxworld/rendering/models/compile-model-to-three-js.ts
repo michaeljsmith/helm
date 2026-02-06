@@ -9,9 +9,10 @@ import { compileModel } from "./compile-model.js";
 
 const material = new MeshPhongMaterial({ color: 0x0000ff });
 
-export const compileModelToThreeJs = (
-  model: Model<unknown>,
-): { geometry: BufferGeometry; material: Material } => {
+export function compileModelToThreeJs(model: Model<unknown>): {
+  geometry: BufferGeometry;
+  material: Material;
+} {
   const results = compileModel(model);
 
   const geometry = new BufferGeometry();
@@ -29,4 +30,4 @@ export const compileModelToThreeJs = (
   );
   geometry.setIndex(results.indices);
   return { geometry, material };
-};
+}

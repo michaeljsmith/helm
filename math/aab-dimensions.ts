@@ -4,27 +4,30 @@ import { Vector2, Vector3 } from "./vector.js";
 type AabbDimensionsBrand = { __IS_AAB_DIMENSIONS__: true };
 
 export type AabDimensions2 = Vector2 & AabbDimensionsBrand;
-export const aabDimensions2With = (
+export function aabDimensions2With(
   width: number,
   height: number,
-): AabDimensions2 => {
+): AabDimensions2 {
   return new Float64Array([width, height]) as AabDimensions2;
-};
+}
 
 export type AabDimensions = Vector3 & AabbDimensionsBrand;
-export const aabDimensionsWith = (
+export function aabDimensionsWith(
   width: number,
   height: number,
   depth: number,
-): AabDimensions => {
+): AabDimensions {
   return new Float64Array([width, height, depth]) as AabDimensions;
-};
+}
 
-export const aabDimensionWidth = (dimensions: AabDimensions): number =>
-  checkExists(dimensions.at(0));
+export function aabDimensionWidth(dimensions: AabDimensions): number {
+  return checkExists(dimensions.at(0));
+}
 
-export const aabDimensionHeight = (dimensions: AabDimensions): number =>
-  checkExists(dimensions.at(1));
+export function aabDimensionHeight(dimensions: AabDimensions): number {
+  return checkExists(dimensions.at(1));
+}
 
-export const aabDimensionDepth = (dimensions: AabDimensions): number =>
-  checkExists(dimensions.at(2));
+export function aabDimensionDepth(dimensions: AabDimensions): number {
+  return checkExists(dimensions.at(2));
+}

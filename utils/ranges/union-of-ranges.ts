@@ -7,11 +7,11 @@ import { lowerBoundComparatorFor } from "./lower-bounds/lower-bound-comparator-f
 import { lowerBoundOf, Range, rangeFromBounds, upperBoundOf } from "./range.js";
 import { upperBoundComparatorFor } from "./upper-bounds/upper-bound-comparator-for.js";
 
-export const unionOfRanges = <T>(
+export function unionOfRanges<T>(
   comparator: Comparator<T>,
   range0: Range<T>,
   range1: Range<T>,
-): Range<T> => {
+): Range<T> {
   // Check that the ranges overlap - if not, we cannot define the union using a Range.
   // This call will throw if there is no intersection.
   intersectionOfRanges(comparator, range0, range1);
@@ -27,9 +27,11 @@ export const unionOfRanges = <T>(
     upperBoundOf(range1),
   );
   return rangeFromBounds(min, max);
-};
+}
 
-export const unionOfRangesNatural = <T extends number | string>(
+export function unionOfRangesNatural<T extends number | string>(
   range0: Range<T>,
   range1: Range<T>,
-): Range<T> => unionOfRanges(naturalComparator, range0, range1);
+): Range<T> {
+  return unionOfRanges(naturalComparator, range0, range1);
+}

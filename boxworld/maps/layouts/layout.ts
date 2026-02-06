@@ -16,17 +16,17 @@ export type ConvertedLayout<Input, Output> = {
   input: Layout<Input>;
 };
 
-export const converted = <Input, Output>(
+export function converted<Input, Output>(
   convert: (input: Iterable<Input>) => Output,
   input: Layout<Input>,
-): Layout<Output> => {
+): Layout<Output> {
   const result: ConvertedLayout<Input, Output> = {
     type: "converted-layout",
     convert,
     input,
   };
   return result as Layout<Output>;
-};
+}
 
 export type FixedLayout<T> = {
   type: "fixed-layout";
@@ -34,20 +34,24 @@ export type FixedLayout<T> = {
   contents: Layout<T>;
 };
 
-export const fixed = <T>(
+export function fixed<T>(
   size: [x: number | undefined, z: number | undefined],
   contents: Layout<T>,
-): FixedLayout<T> => ({ type: "fixed-layout", size, contents });
+): FixedLayout<T> {
+  return { type: "fixed-layout", size, contents };
+}
 
 export type SeriesLayout<T> = {
   type: "series-layout";
   children: Layout<T>[];
 };
 
-export const series = <T>(children: Layout<T>[]): SeriesLayout<T> => ({
-  type: "series-layout",
-  children,
-});
+export function series<T>(children: Layout<T>[]): SeriesLayout<T> {
+  return {
+    type: "series-layout",
+    children,
+  };
+}
 
 export type Layout<T> =
   | LiteralLayout<T>

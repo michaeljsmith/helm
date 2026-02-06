@@ -11,7 +11,7 @@ import {
   WebGLRenderer,
 } from "three";
 import { PhysicsBody } from "../physics/physics-body.js";
-import { updatePhysics } from "../physics/update-physics.js";
+import updatePhysics from "../physics/update-physics.js";
 import { ArtifactSet } from "./artifact-set.js";
 import { TerrainChunk } from "./maps/terrain/terrain-chunk.js";
 import { Terrain } from "./maps/terrain/terrain.js";
@@ -20,11 +20,11 @@ import { compileModelToThreeJs } from "./rendering/models/compile-model-to-three
 import { ModelInstance } from "./rendering/models/instances/model-instance.js";
 import { compileTerrainChunkToThreeJs } from "./rendering/terrain/compile-terrain-chunk-to-three-js.js";
 
-export const mount = <State>(
+export function mount<State>(
   parentDiv: HTMLDivElement,
   world: (state: State) => ArtifactSet,
   init: () => State,
-) => {
+) {
   const state = init();
 
   const scene = new Scene();
@@ -102,14 +102,11 @@ export const mount = <State>(
 
   const ambientlight = new AmbientLight(0xffffff, 0.05);
   scene.add(ambientlight);
-};
+}
 
-const newSceneUpdater = (
+function newSceneUpdater(
   scene: Scene,
-): ((
-  modelInstances: ModelInstance[],
-  terrainChunks: TerrainChunk[],
-) => void) => {
+): (modelInstances: ModelInstance[], terrainChunks: TerrainChunk[]) => void {
   const currentMeshes: Mesh[] = [];
   const modelGeometryAccessor = newModelGeometryAccessor();
   const terrainChunkGeometryAccessor = newTerrainChunkGeometryAccessor();
@@ -138,16 +135,16 @@ const newSceneUpdater = (
       currentMeshes.push(mesh);
     }
   };
-};
+}
 
 type GeometryAndMaterial = {
   geometry: BufferGeometry;
   material: Material;
 };
 
-const newModelGeometryAccessor = (): ((
+function newModelGeometryAccessor(): (
   model: Model<unknown>,
-) => GeometryAndMaterial) => {
+) => GeometryAndMaterial {
   const geometryCache = new WeakMap<Model<unknown>, GeometryAndMaterial>();
   return (model) => {
     let results = geometryCache.get(model);
@@ -158,11 +155,11 @@ const newModelGeometryAccessor = (): ((
 
     return results;
   };
-};
+}
 
-const newTerrainChunkGeometryAccessor = (): ((
+function newTerrainChunkGeometryAccessor(): (
   terrainChunk: TerrainChunk,
-) => GeometryAndMaterial) => {
+) => GeometryAndMaterial {
   const geometryCache = new WeakMap<
     Terrain,
     Map<string, GeometryAndMaterial>
@@ -189,4 +186,4 @@ const newTerrainChunkGeometryAccessor = (): ((
 
     return chunkGeometry;
   };
-};
+}

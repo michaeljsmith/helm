@@ -3,10 +3,10 @@ import { Model } from "../model.js";
 import { TransformedModel } from "../transformed-model.js";
 import { ModelCreationContext } from "./model-creation-context.js";
 
-export const pushTransform = <Tag>(
+export function pushTransform<Tag>(
   context: ModelCreationContext<Tag>,
   tailTransform: RigidTransform,
-) => {
+) {
   const existingModels = context.models;
   const previousCloser = context.closer;
   context.models = [];
@@ -27,4 +27,4 @@ export const pushTransform = <Tag>(
     context.closer = previousCloser;
     previousCloser();
   };
-};
+}

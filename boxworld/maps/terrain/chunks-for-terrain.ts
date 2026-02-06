@@ -5,7 +5,7 @@ import { point2With } from "../../../math/point.js";
 export const CHUNK_SIZE_CELLS = 16;
 
 // TODO: Select chunks to return based on camera position.
-export const chunksForTerrain = function* (bounds: Aab2): Iterable<Aab2> {
+export function* chunksForTerrain(bounds: Aab2): Iterable<Aab2> {
   const left = bounds.center[0] - bounds.dimensions[0];
   const far = bounds.center[1] - bounds.dimensions[1];
   const width = bounds.dimensions[0] * 2;
@@ -31,4 +31,4 @@ export const chunksForTerrain = function* (bounds: Aab2): Iterable<Aab2> {
       };
     }
   }
-};
+}

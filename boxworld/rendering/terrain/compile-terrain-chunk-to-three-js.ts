@@ -10,10 +10,10 @@ import { compileTerrainChunk } from "./compile-terrain-chunk.js";
 
 const material = new MeshPhongMaterial({ color: 0x00ff00 });
 
-export const compileTerrainChunkToThreeJs = (
+export function compileTerrainChunkToThreeJs(
   terrain: Terrain,
   bounds: Aab2,
-): { geometry: BufferGeometry; material: Material } => {
+): { geometry: BufferGeometry; material: Material } {
   const results = compileTerrainChunk(terrain, bounds);
 
   const geometry = new BufferGeometry();
@@ -31,4 +31,4 @@ export const compileTerrainChunkToThreeJs = (
   );
   geometry.setIndex(results.indices);
   return { geometry, material };
-};
+}

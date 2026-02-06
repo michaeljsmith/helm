@@ -13,11 +13,11 @@ import { addModel } from "./add-model.js";
 import { ModelCreationContext } from "./model-creation-context.js";
 import { pushTransform } from "./push-transform.js";
 
-export const addBoxAndMoveForward = <Tag>(
+export function addBoxAndMoveForward<Tag>(
   context: ModelCreationContext<Tag>,
   color: Color3,
   dimensions: AabDimensions,
-): void => {
+): void {
   // Add a transformed box model.
   // The transform is forward half the depth of the box.
   const boxTransform = rigidTransformWith(
@@ -38,4 +38,4 @@ export const addBoxAndMoveForward = <Tag>(
   );
 
   pushTransform(context, tailTransform);
-};
+}

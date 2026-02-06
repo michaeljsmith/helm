@@ -6,10 +6,10 @@ export type PerlinNoiseOctave = {
   amplitude: number;
 };
 
-export const compositePerlinNoise = (
+export function compositePerlinNoise(
   seed: number,
   octaves: PerlinNoiseOctave[],
-): ((position: Point2) => number) => {
+): (position: Point2) => number {
   const octavesWithNoise = octaves.map((octave) => ({
     noise: perlinNoise(seed),
     ...octave,
@@ -23,4 +23,4 @@ export const compositePerlinNoise = (
       )
       .reduce((l, r) => l + r);
   };
-};
+}

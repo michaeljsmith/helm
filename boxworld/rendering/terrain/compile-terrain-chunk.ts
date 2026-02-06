@@ -11,10 +11,10 @@ import { TerrainRenderChunk } from "./terrain-render-chunk.js";
 
 const CELL_SIZE = 1.0;
 
-export const compileTerrainChunk = (
+export function compileTerrainChunk(
   terrain: Terrain,
   bounds: Aab2,
-): TerrainRenderChunk => {
+): TerrainRenderChunk {
   const positions: number[] = [];
   const normals: number[] = [];
   const colors: number[] = [];
@@ -44,7 +44,7 @@ export const compileTerrainChunk = (
 
       const i0 = positions.length / 3;
 
-      const vertexPositionFor = (corner: number): Point => {
+      function vertexPositionFor(corner: number): Point {
         const sideX = (corner & 2) >> 1;
         const sideZ = ((corner + 1) & 2) >> 1;
         const height = corners[sideZ][sideX];
@@ -53,7 +53,7 @@ export const compileTerrainChunk = (
           height * CELL_SIZE,
           (z + sideZ) * CELL_SIZE,
         );
-      };
+      }
 
       const p1 = vertexPositionFor(1);
       const p0 = vertexPositionFor(0);
@@ -79,4 +79,4 @@ export const compileTerrainChunk = (
     colors,
     indices,
   };
-};
+}

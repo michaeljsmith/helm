@@ -4,19 +4,21 @@ import { clampToLowerBound } from "./lower-bounds/clamp-to-lower-bound.js";
 import { lowerBoundOf, Range, upperBoundOf } from "./range.js";
 import { clampToUpperBound } from "./upper-bounds/clamp-to-upper-bound.js";
 
-export const clampToRange = <T>(
+export function clampToRange<T>(
   comparator: Comparator<T>,
   range: Range<T>,
   value: T,
-): T => {
+): T {
   return clampToLowerBound(
     comparator,
     lowerBoundOf(range),
     clampToUpperBound(comparator, upperBoundOf(range), value),
   );
-};
+}
 
-export const clampToRangeNatural = <T extends number | string>(
+export function clampToRangeNatural<T extends number | string>(
   range: Range<T>,
   value: T,
-): T => clampToRange(naturalComparator, range, value);
+): T {
+  return clampToRange(naturalComparator, range, value);
+}

@@ -21,7 +21,7 @@ export default defineConfig([
         },
       ],
 
-      "func-style": ["error", "expression", { allowArrowFunctions: true }],
+      "func-style": ["error", "declaration"],
     },
   },
   tseslint.configs.recommended,

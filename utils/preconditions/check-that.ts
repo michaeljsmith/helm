@@ -1,8 +1,5 @@
-export const checkThat: (
-  condition: unknown,
-  msg?: string,
-) => asserts condition = (condition, msg): asserts condition => {
+export function checkThat(condition: boolean, msg?: string): asserts condition {
   if (!condition) {
     throw new Error(msg);
   }
-};
+}

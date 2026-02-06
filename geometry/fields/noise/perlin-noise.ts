@@ -6,7 +6,7 @@ import { smoothStep } from "../../../math/smooth-step.js";
 import { vectorDifference2 } from "../../../math/vector-difference.js";
 import { checkThat } from "../../../utils/preconditions/check-that.js";
 
-export const perlinNoise = (seed: number): ((position: Point2) => number) => {
+export function perlinNoise(seed: number): (position: Point2) => number {
   return (position): number => {
     const cellX = Math.floor(position[0]);
     const cellY = Math.floor(position[1]);
@@ -38,7 +38,7 @@ export const perlinNoise = (seed: number): ((position: Point2) => number) => {
     const bottom = interpolate(bottomLeft, bottomRight, fractionX);
     return interpolate(top, bottom, fractionY);
   };
-};
+}
 
 const gradientVectorTable: Offset2[] = [
   normalize2(offset2With(-1.0, -1.0)),
@@ -52,7 +52,7 @@ const gradientVectorTable: Offset2[] = [
 ];
 
 // position is expected to be integral.
-const gradientVectorAt = (seed: number, position: Point2): Offset2 => {
+function gradientVectorAt(seed: number, position: Point2): Offset2 {
   // const hash =
   //   (position[0] * 11 + position[1] * 7 + seed) % gradientVectorTable.length;
   const hash = hashPoint(seed, position);
@@ -61,12 +61,11 @@ const gradientVectorAt = (seed: number, position: Point2): Offset2 => {
   const index = Math.floor(hash * gradientVectorTable.length);
   console.log(`index: ${index}, hash: ${hash}, position: ${position}`);
   return gradientVectorTable[index];
-};
+}
 
-const hashPoint = (seed: number, point: Point2): number => {
+function hashPoint(seed: number, point: Point2): number {
   // Offset the coordinate by the seed
   //point = vectorAdd2(point, offset2With(seed * 1.234, seed * 1.902)); // Use a multiplier to avoid diagonal symmetry
-
   // IQ Hash.
   const x = offset2With(
     fractionalPart(point[0] * 123.34),
@@ -79,10 +78,12 @@ const hashPoint = (seed: number, point: Point2): number => {
   const z = offset2With(x[0] + y, x[1] + y);
   const result = z[0] * z[1];
   return fractionalPart(result);
-};
+}
 
-const fractionalPart = (x: number): number => x - Math.floor(x);
+function fractionalPart(x: number): number {
+  return x - Math.floor(x);
+}
 
-const interpolate = (x0: number, x1: number, t: number): number => {
+function interpolate(x0: number, x1: number, t: number): number {
   return x0 + (x1 - x0) * smoothStep(t);
-};
+}

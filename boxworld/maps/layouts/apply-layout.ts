@@ -6,16 +6,16 @@ import { Range } from "../../../utils/ranges/range.js";
 import { sumOfRangesNatural } from "../../../utils/ranges/sum-of-ranges.js";
 import { Layout } from "./layout.js";
 
-export const applyLayout = <T>(layout: Layout<T>): Iterable<T> => {
+export function applyLayout<T>(layout: Layout<T>): Iterable<T> {
   const desiredSize = getDesiredSizeForLayout(layout);
   return constructLayout(
     layout,
     [0, 0],
     [checkExists(desiredSize[0].min), checkExists(desiredSize[1].min)],
   );
-};
+}
 
-const constructLayout = function* <T>(
+function* constructLayout<T>(
   layout: Layout<T>,
   start: [x: number, z: number],
   dimensions: [x: number, z: number],
@@ -69,11 +69,11 @@ const constructLayout = function* <T>(
       }
     }
   }
-};
+}
 
-const getDesiredSizeForLayout = (
+function getDesiredSizeForLayout(
   layout: Layout<unknown>,
-): [x: Range<number>, z: Range<number>] => {
+): [x: Range<number>, z: Range<number>] {
   switch (layout.type) {
     case "literal-layout": {
       return [{}, {}];
@@ -118,4 +118,4 @@ const getDesiredSizeForLayout = (
       return [width, totalDepth];
     }
   }
-};
+}

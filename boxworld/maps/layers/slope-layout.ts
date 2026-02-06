@@ -8,11 +8,11 @@ import { LiteralLayout } from "../layouts/layout.js";
 import { TerrainLayer } from "../terrain/terrain-layer.js";
 import { layer } from "./layer-layout.js";
 
-export const slope = (
+export function slope(
   startHeight: number,
   endHeight: number,
   direction: Direction2,
-): LiteralLayout<TerrainLayer> => {
+): LiteralLayout<TerrainLayer> {
   return layer((bounds) => {
     const fractionalProjectionFor = fractionalProjectionForBounds(
       bounds,
@@ -22,13 +22,13 @@ export const slope = (
       startHeight +
       (endHeight - startHeight) * fractionalProjectionFor(position);
   });
-};
+}
 
 // Visible for testing.
-export const fractionalProjectionForBounds = (
+export function fractionalProjectionForBounds(
   bounds: Aab2,
   direction: Direction2,
-): ((position: Point2) => number) => {
+): (position: Point2) => number {
   const cornerOffset = farthestAabCornerOffset2(bounds.dimensions, direction);
   const nearCorner = vectorSubtract2(bounds.center, cornerOffset);
   const farCorner = vectorAdd2(bounds.center, cornerOffset);
@@ -38,4 +38,4 @@ export const fractionalProjectionForBounds = (
     const projection = project2(direction, position);
     return (projection - nearProjection) / (farProjection - nearProjection);
   };
-};
+}

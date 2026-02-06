@@ -1,9 +1,9 @@
 import { Model } from "../model.js";
 import { ModelCreationContext } from "./model-creation-context.js";
 
-export const addModel = <Tag>(
+export function addModel<Tag>(
   context: ModelCreationContext<Tag>,
   model: Model<Tag>,
-): void => {
+): void {
   context.models.push(model);
-};
+}

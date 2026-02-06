@@ -1,10 +1,10 @@
 import { Direction, X_AXIS, Y_AXIS, Z_AXIS } from "./direction.js";
 import { UnitQuaternion, unitQuaternionWith } from "./unit-quaternion.js";
 
-export const rotationAroundAxis = (
+export function rotationAroundAxis(
   axis: Direction,
   angle: number,
-): UnitQuaternion => {
+): UnitQuaternion {
   const cos = Math.cos(angle / 2);
   const sin = Math.sin(angle / 2);
 
@@ -14,13 +14,16 @@ export const rotationAroundAxis = (
   const z = axis[2] * sin;
 
   return unitQuaternionWith(w, x, y, z);
-};
+}
 
-export const rotationAroundX = (angle: number): UnitQuaternion =>
-  rotationAroundAxis(X_AXIS, angle);
+export function rotationAroundX(angle: number): UnitQuaternion {
+  return rotationAroundAxis(X_AXIS, angle);
+}
 
-export const rotationAroundY = (angle: number): UnitQuaternion =>
-  rotationAroundAxis(Y_AXIS, angle);
+export function rotationAroundY(angle: number): UnitQuaternion {
+  return rotationAroundAxis(Y_AXIS, angle);
+}
 
-export const rotationAroundZ = (angle: number): UnitQuaternion =>
-  rotationAroundAxis(Z_AXIS, angle);
+export function rotationAroundZ(angle: number): UnitQuaternion {
+  return rotationAroundAxis(Z_AXIS, angle);
+}

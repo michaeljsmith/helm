@@ -10,5 +10,6 @@ import { Vector2 } from "./vector.js";
 // different name.
 // TODO: Maybe other use cases of dot products should be given their own name?
 
-export const project2 = (offset: Offset2, vector: Vector2): number =>
-  dotProduct2(offset, vector as unknown as Offset2);
+export function project2(offset: Offset2, vector: Vector2): number {
+  return dotProduct2(offset, vector as unknown as Offset2);
+}

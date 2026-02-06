@@ -9,11 +9,11 @@ import { lowerBoundOf, Range, rangeFromBounds, upperBoundOf } from "./range.js";
 import { upperBoundComparatorFor } from "./upper-bounds/upper-bound-comparator-for.js";
 import { POSITIVE_INFINITY } from "./upper-bounds/upper-bound.js";
 
-export const intersectionOfRanges = <T>(
+export function intersectionOfRanges<T>(
   comparator: Comparator<T>,
   range0: Range<T>,
   range1: Range<T>,
-): Range<T> => {
+): Range<T> {
   const min = maxOf(
     lowerBoundComparatorFor(comparator),
     lowerBoundOf(range0),
@@ -30,9 +30,11 @@ export const intersectionOfRanges = <T>(
       comparator(min, max) <= 0,
   );
   return rangeFromBounds(min, max);
-};
+}
 
-export const intersectionOfRangesNatural = <T extends number | string>(
+export function intersectionOfRangesNatural<T extends number | string>(
   range0: Range<T>,
   range1: Range<T>,
-): Range<T> => intersectionOfRanges(naturalComparator, range0, range1);
+): Range<T> {
+  return intersectionOfRanges(naturalComparator, range0, range1);
+}

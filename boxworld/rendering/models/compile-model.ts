@@ -15,14 +15,12 @@ import { Color3 } from "../../color.js";
 import { BoxModel } from "../../models/box-model.js";
 import { Model } from "../../models/model.js";
 
-export const compileModel = (
-  model: Model<unknown>,
-): {
+export function compileModel(model: Model<unknown>): {
   positions: number[];
   normals: number[];
   colors: number[];
   indices: number[];
-} => {
+} {
   const context: CompileModelContext = {
     transform: IDENTITY_RIGID,
     positions: [],
@@ -38,7 +36,7 @@ export const compileModel = (
     colors: context.colors,
     indices: context.indices,
   };
-};
+}
 
 type CompileModelContext = {
   transform: RigidTransform;
@@ -48,10 +46,10 @@ type CompileModelContext = {
   indices: number[];
 };
 
-const addModelRecurse = (
+function addModelRecurse(
   context: CompileModelContext,
   model: Model<unknown>,
-): void => {
+): void {
   switch (model.type) {
     case "box-model": {
       return addBox(context, model);
@@ -76,17 +74,18 @@ const addModelRecurse = (
       return;
     }
   }
-};
+}
 
-const addBox = (context: CompileModelContext, model: BoxModel): void => {
+function addBox(context: CompileModelContext, model: BoxModel): void {
   for (let axis = 0; axis < 3; ++axis) {
     const normalElements = [0, 0, 0];
     normalElements[axis] = 1;
     const rightElements = [0, 0, 0];
     rightElements[(axis + 1) % 3] = 1;
 
-    const maybeNegateDirection = (negate: boolean, direction: Direction) =>
-      negate ? directionNegate(direction) : direction;
+    function maybeNegateDirection(negate: boolean, direction: Direction) {
+      return negate ? directionNegate(direction) : direction;
+    }
 
     const dimensions: [number, number, number] = [0, 0, 0];
     dimensions[axis] = model.dimensions[0];
@@ -105,15 +104,15 @@ const addBox = (context: CompileModelContext, model: BoxModel): void => {
       addFace(context, normal, right, model.color, dimensions);
     }
   }
-};
+}
 
-const addFace = (
+function addFace(
   context: CompileModelContext,
   normal: Direction,
   right: Direction,
   color: Color3,
   dimensions: [number, number, number],
-): void => {
+): void {
   const up = crossProduct(right, normal);
 
   const scaledRight = vectorScale(right, 0.5 * dimensions[1]);
@@ -154,4 +153,4 @@ const addFace = (
   context.colors.push(...color, ...color, ...color, ...color);
 
   context.indices.push(i0 + 0, i0 + 1, i0 + 2, i0 + 2, i0 + 3, i0 + 0);
-};
+}
