@@ -11,6 +11,8 @@ import { Terrain } from "./boxworld/maps/terrain/terrain.js";
 import { addModel } from "./boxworld/models/creation/add-model.js";
 import { newModel } from "./boxworld/models/creation/new-model.js";
 import { aabDimensionsWith } from "./math/aab-dimensions.js";
+import { directionWith } from "./math/direction.js";
+import { Offset } from "./math/offset.js";
 import { Point, pointWith } from "./math/point.js";
 import { rigidTransformWith } from "./math/rigid-transform.js";
 import { rotationAroundY } from "./math/rotation-around-axis.js";
@@ -43,6 +45,7 @@ const model = newModel((context) => {
 
 type Creature = {
   position: Point;
+  velocity: Offset;
 };
 
 type WorldState = {
@@ -54,6 +57,7 @@ export const newWorld = (): WorldState => {
     creatures: [
       {
         position: pointWith(0, 2, -2),
+        velocity: directionWith(0, 0, -0.5),
       },
     ],
   };
@@ -116,6 +120,7 @@ const artifactForCreature = function* (creature: Creature): Iterable<Artifact> {
       dynamics: {
         value: {
           position: creature.position,
+          velocity: creature.velocity,
         },
         set: (newState) => {
           creature.position = newState.position;
